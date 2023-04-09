@@ -1,0 +1,61 @@
+/* src/components/MethodsTable.module.css */
+.table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+.tableHeader {
+background-color: #4a4a4a;
+font-size: large;
+color: #e5ff00;
+font-weight: bold;
+padding: 1rem;
+text-align: center;
+/* border: 1px solid #ddd; */
+border-radius: 25px 25px 5px 5px;
+}
+
+.tableRow:nth-child(odd) {
+background-color: #f9f9f9;
+}
+
+.tableRow:nth-child(even) {
+background-color: #ffffff;
+}
+
+.tableCell {
+padding: 1rem;
+vertical-align: top;
+border: 1px solid #ddd;
+}
+
+.sortIcon {
+display: inline-block;
+margin-left: 0.5rem;
+}
+  
+
+.tooltip {
+    position: absolute;
+    z-index: 1;
+    visibility: hidden;
+    width: 300px;
+    padding: 5px;
+    background-color: #000000;
+    color: #eeff00;
+    border-radius: 6px;
+    text-align: left;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .intensityCell {
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .intensityCell:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+  }

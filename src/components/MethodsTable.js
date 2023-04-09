@@ -1,8 +1,8 @@
 // src/components/MethodsTable.js
 import React from "react";
 import { useTable, useSortBy, useFilters } from "react-table";
-import { formatHourlyProfit } from "../utils"; // Add this line
-import styles from "./MethodsTable.module.css"; // Import the CSS module
+import { formatHourlyProfit } from "../utils";
+import styles from "./MethodsTable.module.css";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -13,14 +13,49 @@ const formatDate = (dateString) => {
   });
 };
 
-const MethodsTable = ({ data }) => {
+function filterIntensity(rows, id, filterValue) {
+  return rows.filter((row) => {
+    const rowValue = row.values[id];
+    return rowValue
+      ? rowValue.shortDescription
+          .toLowerCase()
+          .includes(filterValue.toLowerCase()) ||
+        rowValue.longDescription
+          .toLowerCase()
+          .includes(filterValue.toLowerCase())
+      : false;
+  });
+}
 
+const SortIcon = ({ column }) => {
+  const handleSortUpClick = (e) => {
+    e.stopPropagation();
+    column.toggleSortBy(false);
+  };
+
+  const handleSortDownClick = (e) => {
+    e.stopPropagation();
+    column.toggleSortBy(true);
+  };
+
+  return (
+    <>
+      <span className={styles.sortIconUp} onClick={handleSortUpClick}>
+        {column.isSorted && !column.isSortedDesc ? "  ▲" : "  △"}
+      </span>
+      <span className={styles.sortIconDown} onClick={handleSortDownClick}>
+        {column.isSorted && column.isSortedDesc ? " ▼" : " ▽"}
+      </span>
+    </>
+  );
+};
+
+const MethodsTable = ({ data }) => {
   const columns = React.useMemo(
     () => [
       {
         Header: "Rank",
-        id: "rank",
-        accessor: (row, rowIndex) => rowIndex + 1,
+        accessor: "rank",
         disableSortBy: true,
         disableFilters: true,
         width: 50,
@@ -31,10 +66,16 @@ const MethodsTable = ({ data }) => {
         accessor: "hourlyProfit",
         Cell: (value) => formatHourlyProfit(value.cell.value),
       },
-      { Header: "Skill or Area", accessor: "skillOrArea" },
       {
-        Header: "Intensity", 
+        Header: "Skill or Area",
+        accessor: "skillOrArea",
+        Filter: DefaultColumnFilter,
+      },
+      {
+        Header: "Intensity",
         accessor: "intensity",
+        Filter: DefaultColumnFilter,
+        filter: filterIntensity,
         Cell: ({ row }) => (
           <div className={styles.intensityCell}>
             {row.values.intensity && (
@@ -62,53 +103,94 @@ const MethodsTable = ({ data }) => {
     []
   );
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable(
-      {
-        columns,
-        data,
-      },
-      useFilters,
-      useSortBy
-    );
+  const defaultColumn = React.useMemo(
+    () => ({
+      Filter: DefaultColumnFilter,
+    }),
+    []
+  );
+
+  const processData = React.useMemo(
+    () =>
+      data.map((row, index) => ({
+        ...row,
+        rank: index + 1,
+      })),
+    [data]
+  );
+
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+  } = useTable(
+    {
+      columns,
+      data,
+      data: processData,
+      defaultColumn,
+    },
+    useFilters,
+    useSortBy
+  );
 
   return (
-    <table {...getTableProps()} className={styles.table}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th
-                {...column.getHeaderProps(column.getSortByToggleProps())}
-                className={styles.tableHeader}
-              >
-                {column.render("Header")}
-                <span className={styles.sortIcon}>
-                  {column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}
-                </span>
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()} className={styles.tableRow}>
-              {row.cells.map((cell) => {
-                return (
-                  <td {...cell.getCellProps()} className={styles.tableCell}>
-                    {cell.render("Cell")}
-                  </td>
-                );
-              })}
+    <>
+      <table {...getTableProps()} className={styles.table}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()} className={styles.tableHeader}>
+                  {column.render("Header")}
+                  <span>
+                    <SortIcon column={column} />
+                  </span>
+                  <div>
+                    {column.canFilter ? column.render("Filter") : null}
+                  </div>
+                </th>
+              ))}
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()} className={styles.tableRow}>
+                {row.cells.map((cell) => {
+                  return (
+                    <td {...cell.getCellProps()} className={styles.tableCell}>
+                      {cell.render("Cell")}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 };
+
+function DefaultColumnFilter({
+  column: { filterValue, preFilteredRows, setFilter },
+}) {
+  const count = preFilteredRows.length;
+
+  return (
+    <input
+      value={filterValue || ""}
+      onChange={(e) => {
+        setFilter(e.target.value || undefined);
+      }}
+      placeholder={`Search ${count} records...`}
+    />
+  );
+}
 
 export default MethodsTable;

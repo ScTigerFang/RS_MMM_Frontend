@@ -1,0 +1,6 @@
+Priority list
+Update readme file
+change loading screen
+restructure code, move some functions out to their own file
+adjust styling a little
+make mobile friendly/Progressive web app

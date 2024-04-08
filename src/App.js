@@ -2,18 +2,15 @@ import React, { useEffect } from "react";
 import "./App.css";
 import { QueryClient, QueryClientProvider } from "react-query";
 import MethodsTable from "./components/MethodsTable";
+import Footer from "./components/Footer";
 import { useMethods } from "./hooks/useMethods";
 import { useIntensity } from "./hooks/useIntensity";
-import image2 from "./image/3.jpg";
-import image3 from "./image/4.jpg";
-import image4 from "./image/5.jpg";
-import image5 from "./image/6.jpg";
+import { backgroundImages } from "./config/images";
 
 const queryClient = new QueryClient();
 
-const backgroundImages = [image2, image3, image4, image5, image5];
-
 function App() {
+  console.log(process.env.REACT_APP_BACKGROUND_IMAGES);
   const {
     data: methodsData,
     isLoading: methodsLoading,
@@ -26,17 +23,13 @@ function App() {
   } = useIntensity();
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-    const randomImage = backgroundImages[randomIndex];
-    // Set the body background image
+    const randomImage =
+      backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+    document.body.classList.add("custom-background");
     document.body.style.backgroundImage = `url(${randomImage})`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundAttachment = "fixed";
-    document.body.style.backgroundRepeat = "no-repeat";
-
+    console.log(randomImage);
     return () => {
-      document.body.style.background = "none";
+      document.body.classList.remove("custom-background");
     };
   }, []);
 
@@ -57,12 +50,15 @@ function App() {
         <h1 className="title">Money Making Methods</h1>
         <MethodsTable data={methodsWithIntensity} />
       </div>
+      <Footer />
     </div>
   );
 }
 
-export default () => (
+const AppWithQueryProvider = () => (
   <QueryClientProvider client={queryClient}>
     <App />
   </QueryClientProvider>
 );
+
+export default AppWithQueryProvider;

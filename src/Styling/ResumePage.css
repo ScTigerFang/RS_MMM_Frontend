@@ -1,0 +1,38 @@
+.resume-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.resume-header h1 {
+  margin-bottom: 0;
+}
+
+.resume-header p {
+  margin-top: 5px;
+}
+
+.skills ul,
+.experience ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.experience article {
+  margin-bottom: 20px;
+}
+
+.resume-footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+  }
+  .resume-container {
+    width: 100%;
+  }
+}

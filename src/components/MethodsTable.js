@@ -2,7 +2,7 @@
 import React from "react";
 import { useTable, useSortBy, useFilters } from "react-table";
 import { formatHourlyProfit } from "../utils";
-import styles from "./MethodsTable.module.css";
+import styles from "../Styling/MethodsTable.module.css";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -20,9 +20,9 @@ function filterIntensity(rows, id, filterValue) {
       ? rowValue.shortDescription
           .toLowerCase()
           .includes(filterValue.toLowerCase()) ||
-        rowValue.longDescription
-          .toLowerCase()
-          .includes(filterValue.toLowerCase())
+          rowValue.longDescription
+            .toLowerCase()
+            .includes(filterValue.toLowerCase())
       : false;
   });
 }
@@ -81,7 +81,9 @@ const MethodsTable = ({ data }) => {
             {row.values.intensity && (
               <>
                 <span>{row.values.intensity.shortDescription}</span>
-                <div className={styles.tooltip}>{row.values.intensity.longDescription}</div>
+                <div className={styles.tooltip}>
+                  {row.values.intensity.longDescription}
+                </div>
               </>
             )}
           </div>
@@ -119,22 +121,17 @@ const MethodsTable = ({ data }) => {
     [data]
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      data: processData,
-      defaultColumn,
-    },
-    useFilters,
-    useSortBy
-  );
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data,
+        data: processData,
+        defaultColumn,
+      },
+      useFilters,
+      useSortBy
+    );
 
   return (
     <>
@@ -148,9 +145,7 @@ const MethodsTable = ({ data }) => {
                   <span>
                     <SortIcon column={column} />
                   </span>
-                  <div>
-                    {column.canFilter ? column.render("Filter") : null}
-                  </div>
+                  <div>{column.canFilter ? column.render("Filter") : null}</div>
                 </th>
               ))}
             </tr>

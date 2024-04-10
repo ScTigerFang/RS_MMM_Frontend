@@ -1,29 +1,7 @@
 {
-  "routes": [
-    {
-      "route": "/",
-      "serve": "/index.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/rs_MMM",
-      "serve": "/index.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/resume",
-      "serve": "/index.html",
-      "statusCode": 200
-    },
-    {
-      "route": "/*",
-      "serve": "/index.html",
-      "statusCode": 404
-    }
-  ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/images/*", "/css/*"]
+    "exclude": ["/images/*", "/css/*", "/js/*"]
   },
   "responseOverrides": {
     "404": {

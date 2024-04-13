@@ -68,7 +68,9 @@ function ResumePage() {
         <h2>Education</h2>
         {education.map((edu, index) => (
           <p key={index}>
-            {edu.school} - {edu.degree}, {edu.duration}
+            {edu.school}
+            <p> {edu.duration}</p>
+            <p>{edu.degree}</p>
           </p>
         ))}
       </section>

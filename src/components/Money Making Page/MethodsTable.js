@@ -1,8 +1,8 @@
-// src/components/MethodsTable.js
+// src/components/Money Making Page/MethodsTable.js
 import React from "react";
-import { useTable, useSortBy, useFilters } from "react-table";
-import { formatHourlyProfit } from "../utils";
-import styles from "../Styling/MethodsTable.module.css";
+import { useFilters, useSortBy, useTable } from "react-table";
+import styles from "../../Styling/MethodsTable.module.css";
+import { formatHourlyProfit } from "../../utils";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -18,11 +18,11 @@ function filterIntensity(rows, id, filterValue) {
     const rowValue = row.values[id];
     return rowValue
       ? rowValue.shortDescription
-          .toLowerCase()
-          .includes(filterValue.toLowerCase()) ||
-          rowValue.longDescription
-            .toLowerCase()
-            .includes(filterValue.toLowerCase())
+        .toLowerCase()
+        .includes(filterValue.toLowerCase()) ||
+      rowValue.longDescription
+        .toLowerCase()
+        .includes(filterValue.toLowerCase())
       : false;
   });
 }
@@ -50,7 +50,7 @@ const SortIcon = ({ column }) => {
   );
 };
 
-const MethodsTable = ({ data }) => {
+const MethodsTable = ({ data, onEdit = () => { } }) => {
   const columns = React.useMemo(
     () => [
       {
@@ -101,6 +101,20 @@ const MethodsTable = ({ data }) => {
         ),
         disableFilters: true,
       },
+      {
+        Header: "Actions",
+        id: "actions",
+        Cell: ({ row }) => (
+          <button
+            className={styles.primaryButton}
+            onClick={() => onEdit(row.original)}
+          >
+            Edit
+          </button>
+        ),
+        disableFilters: true,
+        disableSortBy: true
+      }
     ],
     []
   );
@@ -125,7 +139,6 @@ const MethodsTable = ({ data }) => {
     useTable(
       {
         columns,
-        data,
         data: processData,
         defaultColumn,
       },

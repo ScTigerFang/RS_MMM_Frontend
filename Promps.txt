@@ -1,0 +1,46 @@
+I have this Front end application that is react based.
+It displays a list of money making methods for the game runescape and it fetches data from 
+a C# backend.
+
+Backend API Summary
+Based on my analysis, here's a comprehensive summary of your RuneScape Money Making Methods (RS_MMM) backend API:
+
+API Overview
+Framework: ASP.NET Core Web API (C#)
+Database: SQL Server with Entity Framework Core
+Base URL: https://rsmmmapi.azurewebsites.net/ (production) or https://localhost:7239/ (development)
+Documentation: Swagger UI available at /swagger
+CORS: Configured to allow localhost:3000 (React frontend)
+Available Endpoints
+Money Making Methods Controller (/MoneyMakingMethod)
+Method	Endpoint	Description	Request Body	Response
+GET	/MoneyMakingMethod	Get all money making methods (ordered by hourly profit desc)	None	Array of MoneyMakingMethod objects
+GET	/MoneyMakingMethod/{id}	Get specific method by GUID	None	Single MoneyMakingMethod object
+POST	/MoneyMakingMethod	Create new money making method	MoneyMakingMethod object	Created MoneyMakingMethod with 201 status
+PUT	/MoneyMakingMethod/{id}	Update existing method	MoneyMakingMethod object	204 No Content on success
+DELETE	/MoneyMakingMethod/{id}	Delete method by GUID	None	204 No Content on success
+Intensity Controller (/Intensity)
+Method	Endpoint	Description	Request Body	Response
+GET	/Intensity	Get all intensity levels	None	Array of Intensity objects
+GET	/Intensity/{id}	Get specific intensity by ID	None	Single Intensity object
+POST	/Intensity	Create new intensity level	Intensity object	Created Intensity with 201 status
+PUT	/Intensity/{id}	Update existing intensity	Intensity object	204 No Content on success
+DELETE	/Intensity/{id}	Delete intensity by ID	None	204 No Content on success
+Data Models
+MoneyMakingMethod
+{
+  "methodId": "guid", // Auto-generated
+  "intensity": 1, // Foreign key to Intensity table
+  "method": "Golden Roses Farming",
+  "hourlyProfit": 4060000,
+  "skillOrArea": "Skilling/Farming",
+  "videoLink": "https://www.youtube.com/watch?v=...",
+  "notes": "Optional notes",
+  "createdDatetime": "2025-07-04T..." // Auto-generated
+}
+Intensity
+{
+  "intensityId": 1,
+  "shortDescription": "Low",
+  "longDescription": "Requires minimal attention"
+}

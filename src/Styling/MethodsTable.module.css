@@ -58,3 +58,17 @@
   visibility: visible;
   opacity: 1;
 }
+
+/* NEW: primary button for “Add” & “Edit” */
+.primaryButton {
+  background: #e5ff00;
+  color: #4a4a4a;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.primaryButton:hover {
+  opacity: 0.9;
+}

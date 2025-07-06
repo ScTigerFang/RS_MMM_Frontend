@@ -1,11 +1,10 @@
 // App.js
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import HomePage from "./components/HomePage";
-import RS_MMM from "./components/RS_MMM";
-import ResumePage from "./components/ResumePage";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import './App.css'; // Ensure this file exists to include the styles
+import HomePage from "./components/HomePage";
+import RS_MMM from "./components/Money Making Page/RS_MMM";
+import ResumePage from "./components/ResumePage";
 
 const queryClient = new QueryClient();
 

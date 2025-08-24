@@ -72,3 +72,49 @@
 .primaryButton:hover {
   opacity: 0.9;
 }
+
+/* Solid highlight for newest row (no transparency) */
+.tableRow.rowNew {
+  background-color: #fffce1;          /* soft light-yellow */
+  border-left: 6px solid #e5ff00;      /* accent bar */
+  box-shadow: inset 0 0 0 1px #e8e8e8; /* crisp edge */
+}
+
+/* Make text + links pop on the highlighted row */
+.tableRow.rowNew .tableCell {
+  color: #1f2937;            /* darker text for contrast */
+}
+.tableRow.rowNew a {
+  color: #1e3a8a;            /* readable link color on light bg */
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* Method cell + badge: stronger contrast on light-yellow row */
+.methodCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.badge {
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+.badgeNew {
+  background: rgb(255, 0, 0);   /* dark pill */
+  color: lab(100% 0.01 -0.01);        /* brand yellow text */
+  box-shadow: 0 0 0 2px #fffce1; /* subtle ring to blend with row */
+}
+
+/* Optional: emphasize the Method text on the newest row */
+.tableRow.rowNew .methodCell > span:first-child {
+  font-weight: 800;
+  color: #111827;
+  text-shadow: 0 1px 0 rgba(255,255,255,.6);
+}
+

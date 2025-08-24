@@ -17,12 +17,8 @@ function filterIntensity(rows, id, filterValue) {
   return rows.filter((row) => {
     const rowValue = row.values[id];
     return rowValue
-      ? rowValue.shortDescription
-        .toLowerCase()
-        .includes(filterValue.toLowerCase()) ||
-      rowValue.longDescription
-        .toLowerCase()
-        .includes(filterValue.toLowerCase())
+      ? rowValue.shortDescription.toLowerCase().includes(filterValue.toLowerCase()) ||
+      rowValue.longDescription.toLowerCase().includes(filterValue.toLowerCase())
       : false;
   });
 }
@@ -51,6 +47,26 @@ const SortIcon = ({ column }) => {
 };
 
 const MethodsTable = ({ data, onEdit = () => { } }) => {
+  const processData = React.useMemo(
+    () =>
+      (data || []).map((row, index) => ({
+        ...row,
+        rank: index + 1,
+        _createdTS: row?.createdDatetime ? new Date(row.createdDatetime).getTime() : null,
+      })),
+    [data]
+  );
+
+  const newestCreatedTS = React.useMemo(() => {
+    const vals = processData.map(r =>
+      typeof r._createdTS === "number" ? r._createdTS : -Infinity
+    );
+    const max = vals.length ? Math.max(...vals) : null;
+    return Number.isFinite(max) ? max : null;
+  }, [processData]);
+
+
+  // 3) Columns (can show badges based on those timestamps)
   const columns = React.useMemo(
     () => [
       {
@@ -60,7 +76,25 @@ const MethodsTable = ({ data, onEdit = () => { } }) => {
         disableFilters: true,
         width: 50,
       },
-      { Header: "Method", accessor: "method" },
+      {
+        Header: "Method",
+        accessor: "method",
+        Cell: ({ row, value }) => {
+          const isNewestCreated =
+            row.original._createdTS != null && row.original._createdTS === newestCreatedTS;
+
+          return (
+            <div className={styles.methodCell}>
+              <span>{value}</span>
+              {isNewestCreated && (
+                <span className={`${styles.badge} ${styles.badgeNew}`} aria-label="Newest method">
+                  NEW
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
       {
         Header: "Hourly Profit",
         accessor: "hourlyProfit",
@@ -81,9 +115,7 @@ const MethodsTable = ({ data, onEdit = () => { } }) => {
             {row.values.intensity && (
               <>
                 <span>{row.values.intensity.shortDescription}</span>
-                <div className={styles.tooltip}>
-                  {row.values.intensity.longDescription}
-                </div>
+                <div className={styles.tooltip}>{row.values.intensity.longDescription}</div>
               </>
             )}
           </div>
@@ -105,18 +137,15 @@ const MethodsTable = ({ data, onEdit = () => { } }) => {
         Header: "Actions",
         id: "actions",
         Cell: ({ row }) => (
-          <button
-            className={styles.primaryButton}
-            onClick={() => onEdit(row.original)}
-          >
+          <button className={styles.primaryButton} onClick={() => onEdit(row.original)}>
             Edit
           </button>
         ),
         disableFilters: true,
-        disableSortBy: true
-      }
+        disableSortBy: true,
+      },
     ],
-    []
+    [onEdit, newestCreatedTS]
   );
 
   const defaultColumn = React.useMemo(
@@ -126,25 +155,15 @@ const MethodsTable = ({ data, onEdit = () => { } }) => {
     []
   );
 
-  const processData = React.useMemo(
-    () =>
-      data.map((row, index) => ({
-        ...row,
-        rank: index + 1,
-      })),
-    [data]
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
+    {
+      columns,
+      data: processData,
+      defaultColumn,
+    },
+    useFilters,
+    useSortBy
   );
-
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable(
-      {
-        columns,
-        data: processData,
-        defaultColumn,
-      },
-      useFilters,
-      useSortBy
-    );
 
   return (
     <>
@@ -167,15 +186,24 @@ const MethodsTable = ({ data, onEdit = () => { } }) => {
         <tbody {...getTableBodyProps()}>
           {rows.map((row) => {
             prepareRow(row);
+            const isNewestCreated = row.original._createdTS != null && row.original._createdTS === newestCreatedTS;
+            const isNewestUpdated =
+              row.original._updatedTS != null;
+
+            const rowClass =
+              styles.tableRow +
+              " " +
+              (isNewestCreated ? styles.rowNew : "") +
+              " " +
+              (!isNewestCreated && isNewestUpdated ? styles.rowUpdated : "");
+
             return (
-              <tr {...row.getRowProps()} className={styles.tableRow}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td {...cell.getCellProps()} className={styles.tableCell}>
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
+              <tr {...row.getRowProps()} className={rowClass}>
+                {row.cells.map((cell) => (
+                  <td {...cell.getCellProps()} className={styles.tableCell}>
+                    {cell.render("Cell")}
+                  </td>
+                ))}
               </tr>
             );
           })}
@@ -185,11 +213,8 @@ const MethodsTable = ({ data, onEdit = () => { } }) => {
   );
 };
 
-function DefaultColumnFilter({
-  column: { filterValue, preFilteredRows, setFilter },
-}) {
+function DefaultColumnFilter({ column: { filterValue, preFilteredRows, setFilter } }) {
   const count = preFilteredRows.length;
-
   return (
     <input
       value={filterValue || ""}

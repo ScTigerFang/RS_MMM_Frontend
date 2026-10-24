@@ -60,6 +60,8 @@ The home and RuneScape pages use dark blue panels, gold accents, the existing ar
 
 The header uses the supplied transparent logo at `public/image/tigerfang-logo.png` and the name **TigerFang**. The resume toolbar contains the print button without repeating the navigation breadcrumb. The methods page opens directly into the table panel, with an animated loading ring and skeleton rows while either API request is pending. Loading animations respect reduced-motion preferences. Intensity badge colors follow the API IDs: 1 / Super AFK (green), 2 / AFK (teal), 3 / Chill (blue), 4 / Focused (amber), and 5 / Super Engaging (coral). Labels remain visible, and unknown IDs use a neutral badge.
 
+Browser and mobile icons use a transparent crowned white tiger derived from the supplied logo. The `public/tigerfang-icon-*.png` sizes serve browser tabs, Apple touch icons, and the web app manifest; `public/tigerfang-favicon.ico` includes 16 through 256 pixel sizes. `public/favicon.ico` is the matching fallback for browsers that request the conventional path. The full header artwork remains at `public/image/tigerfang-logo.png`.
+
 ### Printing or saving the resume as a PDF
 
 1. Open `/resume` and click **Print / save PDF** (or use the browser's Print command).

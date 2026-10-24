@@ -1,0 +1,194 @@
+.methods-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 740px;
+  padding: 35px 40px 36px;
+  overflow: hidden;
+}
+.methods-scene {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 530px;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, #111b22a8 0%, #111b22d9 56%, #111b22 100%),
+    var(--scene-image) center 38% / cover;
+}
+.methods-content {
+  max-width: 1280px;
+  margin: auto;
+}
+.methods-hero {
+  text-align: center;
+  padding: 12px 20px 28px;
+}
+.methods-hero h1 {
+  margin: 0;
+  color: #f3e6c6;
+  font: clamp(34px, 4.3vw, 62px) / 1.15 var(--display-font);
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 12px #0006;
+}
+.methods-panel {
+  overflow: hidden;
+  background: #192832;
+  border: 1px solid #63767555;
+  border-radius: 7px;
+  box-shadow: 0 15px 40px #0002;
+}
+.methods-panel-heading {
+  padding: 25px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #7b8e9526;
+}
+.methods-panel-heading h2 {
+  margin-top: 0;
+  color: #e8dfc8;
+  font: 27px/1.2 var(--display-font);
+}
+.methods-panel-heading .button {
+  font-size: 11px;
+  min-height: 40px;
+  padding: 11px 16px;
+  gap: 8px;
+}
+.methods-panel-heading .button .icon {
+  width: 16px;
+  height: 16px;
+}
+.methods-loading,
+.methods-empty {
+  padding: 45px 25px 48px;
+  text-align: center;
+}
+.state-icon,
+.loading-rune {
+  display: inline-grid;
+  place-items: center;
+  height: 50px;
+  width: 50px;
+  border: 1px solid #a68f5e45;
+  border-radius: 50%;
+  color: #ccb581;
+  background: #d0b36d08;
+}
+.loading-rune {
+  position: relative;
+  width: 62px;
+  height: 62px;
+}
+.loading-rune::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 2px solid transparent;
+  border-top-color: #e0bd72;
+  border-right-color: #e0bd7266;
+  border-radius: 50%;
+  animation: rune-orbit 1.4s linear infinite;
+}
+.loading-rune .icon {
+  width: 28px;
+  height: 28px;
+}
+@keyframes rune-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes method-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.methods-loading h3,
+.methods-empty h3 {
+  margin-top: 21px;
+  color: #e9ddbf;
+  font: 26px/1.4 var(--display-font);
+}
+.methods-loading p,
+.methods-empty p {
+  margin-top: 12px;
+  color: #a0b0b7;
+  font-size: 12px;
+  line-height: 1.9;
+}
+.methods-empty .button {
+  margin-top: 24px;
+  font-size: 11px;
+}
+.methods-empty .button .icon {
+  height: 15px;
+  width: 15px;
+}
+.skeleton-rows {
+  display: grid;
+  gap: 10px;
+  max-width: 800px;
+  margin: 35px auto 0;
+}
+.skeleton-rows span {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  height: 28px;
+  background: #263941;
+  border-radius: 3px;
+}
+.skeleton-rows span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #92aeb51c, transparent);
+  animation: method-shimmer 1.8s ease-in-out infinite;
+}
+.skeleton-rows span:nth-child(2)::after {
+  animation-delay: 0.12s;
+}
+.skeleton-rows span:nth-child(3)::after {
+  animation-delay: 0.24s;
+}
+.skeleton-rows span:nth-child(4)::after {
+  animation-delay: 0.36s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-rune::after,
+  .skeleton-rows span::after {
+    animation: none;
+  }
+}
+@media (max-width: 800px) {
+  .methods-page {
+    padding: 35px 24px;
+  }
+}
+@media (max-width: 550px) {
+  .methods-page {
+    padding: 30px 20px;
+  }
+  .methods-hero {
+    padding: 8px 0 28px;
+  }
+  .methods-hero h1 {
+    font-size: 37px;
+  }
+  .methods-panel-heading {
+    padding: 21px 19px;
+    gap: 12px;
+  }
+  .methods-panel-heading h2 {
+    font-size: 23px;
+  }
+  .methods-panel-heading .button {
+    padding: 10px 11px;
+    font-size: 10px;
+    gap: 5px;
+  }
+}

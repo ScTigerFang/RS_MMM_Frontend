@@ -1,229 +1,278 @@
-// src/components/Money Making Page/MethodsTable.js
-import React from "react";
+import { useMemo } from "react";
 import { useFilters, useSortBy, useTable } from "react-table";
 import styles from "../../Styling/MethodsTable.module.css";
 import { formatHourlyProfit } from "../../utils";
+import Icon from "../Icon";
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-};
+function formatDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "—"
+    : date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+}
 
-function filterIntensity(rows, id, filterValue) {
+function filterIntensity(rows, id, value) {
+  const query = value.toLowerCase();
   return rows.filter((row) => {
-    const rowValue = row.values[id];
-    return rowValue
-      ? rowValue.shortDescription.toLowerCase().includes(filterValue.toLowerCase()) ||
-      rowValue.longDescription.toLowerCase().includes(filterValue.toLowerCase())
-      : false;
+    const intensity = row.values[id];
+    return Boolean(
+      intensity &&
+        ((intensity.shortDescription || "").toLowerCase().includes(query) ||
+          (intensity.longDescription || "").toLowerCase().includes(query)),
+    );
   });
 }
 
-const SortIcon = ({ column }) => {
-  const handleSortUpClick = (e) => {
-    e.stopPropagation();
-    column.toggleSortBy(false);
-  };
-
-  const handleSortDownClick = (e) => {
-    e.stopPropagation();
-    column.toggleSortBy(true);
-  };
-
-  return (
-    <>
-      <span className={styles.sortIconUp} onClick={handleSortUpClick}>
-        {column.isSorted && !column.isSortedDesc ? "  ▲" : "  △"}
-      </span>
-      <span className={styles.sortIconDown} onClick={handleSortDownClick}>
-        {column.isSorted && column.isSortedDesc ? " ▼" : " ▽"}
-      </span>
-    </>
-  );
-};
-
-const MethodsTable = ({ data, onEdit = () => { } }) => {
-  const processData = React.useMemo(
-    () =>
-      (data || []).map((row, index) => ({
-        ...row,
-        rank: index + 1,
-        _createdTS: row?.createdDatetime ? new Date(row.createdDatetime).getTime() : null,
-      })),
-    [data]
-  );
-
-  const newestCreatedTS = React.useMemo(() => {
-    const vals = processData.map(r =>
-      typeof r._createdTS === "number" ? r._createdTS : -Infinity
-    );
-    const max = vals.length ? Math.max(...vals) : null;
-    return Number.isFinite(max) ? max : null;
-  }, [processData]);
-
-
-  // 3) Columns (can show badges based on those timestamps)
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "Rank",
-        accessor: "rank",
-        disableSortBy: true,
-        disableFilters: true,
-        width: 50,
-      },
-      {
-        Header: "Method",
-        accessor: "method",
-        Cell: ({ row, value }) => {
-          const isNewestCreated =
-            row.original._createdTS != null && row.original._createdTS === newestCreatedTS;
-
-          return (
-            <div className={styles.methodCell}>
-              <span>{value}</span>
-              {isNewestCreated && (
-                <span className={`${styles.badge} ${styles.badgeNew}`} aria-label="Newest method">
-                  NEW
-                </span>
-              )}
-            </div>
-          );
-        },
-      },
-      {
-        Header: "Hourly Profit",
-        accessor: "hourlyProfit",
-        Cell: (value) => formatHourlyProfit(value.cell.value),
-      },
-      {
-        Header: "Skill or Area",
-        accessor: "skillOrArea",
-        Filter: DefaultColumnFilter,
-      },
-      {
-        Header: "Intensity",
-        accessor: "intensity",
-        Filter: DefaultColumnFilter,
-        filter: filterIntensity,
-        Cell: ({ row }) => (
-          <div className={styles.intensityCell}>
-            {row.values.intensity && (
-              <>
-                <span>{row.values.intensity.shortDescription}</span>
-                <div className={styles.tooltip}>{row.values.intensity.longDescription}</div>
-              </>
-            )}
-          </div>
-        ),
-      },
-      { Header: "Notes", accessor: "notes" },
-      {
-        Header: "Created",
-        id: "created",
-        accessor: (row) => formatDate(row.createdDatetime),
-        Cell: ({ row }) => (
-          <a href={row.original.videoLink} target="_blank" rel="noreferrer">
-            {row.values.created}
-          </a>
-        ),
-        disableFilters: true,
-      },
-      {
-        Header: "Actions",
-        id: "actions",
-        Cell: ({ row }) => (
-          <button className={styles.primaryButton} onClick={() => onEdit(row.original)}>
-            Edit
-          </button>
-        ),
-        disableFilters: true,
-        disableSortBy: true,
-      },
-    ],
-    [onEdit, newestCreatedTS]
-  );
-
-  const defaultColumn = React.useMemo(
-    () => ({
-      Filter: DefaultColumnFilter,
-    }),
-    []
-  );
-
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
-    {
-      columns,
-      data: processData,
-      defaultColumn,
-    },
-    useFilters,
-    useSortBy
-  );
-
-  return (
-    <>
-      <table {...getTableProps()} className={styles.table}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()} className={styles.tableHeader}>
-                  {column.render("Header")}
-                  <span>
-                    <SortIcon column={column} />
-                  </span>
-                  <div>{column.canFilter ? column.render("Filter") : null}</div>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            const isNewestCreated = row.original._createdTS != null && row.original._createdTS === newestCreatedTS;
-            const isNewestUpdated =
-              row.original._updatedTS != null;
-
-            const rowClass =
-              styles.tableRow +
-              " " +
-              (isNewestCreated ? styles.rowNew : "") +
-              " " +
-              (!isNewestCreated && isNewestUpdated ? styles.rowUpdated : "");
-
-            return (
-              <tr {...row.getRowProps()} className={rowClass}>
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()} className={styles.tableCell}>
-                    {cell.render("Cell")}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </>
-  );
-};
-
-function DefaultColumnFilter({ column: { filterValue, preFilteredRows, setFilter } }) {
-  const count = preFilteredRows.length;
+function ColumnFilter({ column: { Header, filterValue, setFilter } }) {
   return (
     <input
+      className={styles.filter}
+      type="search"
+      aria-label={"Filter " + Header}
       value={filterValue || ""}
-      onChange={(e) => {
-        setFilter(e.target.value || undefined);
-      }}
-      placeholder={`Search ${count} records...`}
+      placeholder="Search…"
+      onChange={(event) => setFilter(event.target.value || undefined)}
     />
   );
 }
 
-export default MethodsTable;
+export default function MethodsTable({ data, onEdit }) {
+  const processData = useMemo(
+    () => data.map((row, index) => ({ ...row, rank: index + 1 })),
+    [data],
+  );
+  const newestTimestamp = useMemo(
+    () =>
+      processData.reduce(
+        (newest, row) =>
+          Math.max(newest, new Date(row.createdDatetime).getTime() || 0),
+        0,
+      ),
+    [processData],
+  );
+  const columns = useMemo(
+    () => [
+      {
+        Header: "#",
+        accessor: "rank",
+        disableSortBy: true,
+        disableFilters: true,
+      },
+      {
+        Header: "Method",
+        accessor: "method",
+        Cell: ({ row, value }) => (
+          <div className={styles.methodCell}>
+            <span>{value}</span>
+            {newestTimestamp > 0 &&
+            new Date(row.original.createdDatetime).getTime() ===
+              newestTimestamp ? (
+              <span className={styles.badge}>New</span>
+            ) : null}
+          </div>
+        ),
+      },
+      {
+        Header: "Hourly profit",
+        accessor: "hourlyProfit",
+        Cell: ({ value }) => (
+          <span className={styles.profit}>
+            {formatHourlyProfit(value)}
+            <small> GP / hr</small>
+          </span>
+        ),
+      },
+      { Header: "Skill / area", accessor: "skillOrArea" },
+      {
+        Header: "Intensity",
+        accessor: "intensity",
+        filter: filterIntensity,
+        sortType: (a, b, id) =>
+          (a.values[id]?.intensityId || 0) - (b.values[id]?.intensityId || 0),
+        Cell: ({ value }) =>
+          value ? (
+            <span
+              className={styles.intensityCell}
+              data-intensity-level={value.intensityId}
+              tabIndex="0"
+            >
+              <span className={styles.intensityDot} aria-hidden="true" />
+              {value.shortDescription}
+              <span className={styles.tooltip}>{value.longDescription}</span>
+            </span>
+          ) : (
+            "—"
+          ),
+      },
+      { Header: "Notes", accessor: "notes" },
+      {
+        Header: "Added / guide",
+        accessor: "createdDatetime",
+        disableFilters: true,
+        Cell: ({ row, value }) => (
+          <div className={styles.guideCell}>
+            <span>{formatDate(value)}</span>
+            {/^https?:\/\//i.test(row.original.videoLink || "") ? (
+              <a href={row.original.videoLink} target="_blank" rel="noreferrer">
+                Watch guide <Icon name="external" />
+              </a>
+            ) : null}
+          </div>
+        ),
+      },
+      {
+        Header: "Edit",
+        id: "actions",
+        disableFilters: true,
+        disableSortBy: true,
+        Cell: ({ row }) => (
+          <button
+            className={styles.editButton}
+            aria-label={"Edit " + row.original.method}
+            onClick={() => onEdit(row.original)}
+          >
+            Edit <Icon name="arrow" />
+          </button>
+        ),
+      },
+    ],
+    [newestTimestamp, onEdit],
+  );
+  const defaultColumn = useMemo(() => ({ Filter: ColumnFilter }), []);
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    setAllFilters,
+    state,
+  } = useTable(
+    { columns, data: processData, defaultColumn },
+    useFilters,
+    useSortBy,
+  );
+
+  return (
+    <>
+      <div className={styles.tableToolbar}>
+        <span role="status">
+          {rows.length} of {data.length} methods
+        </span>
+        <span>
+          {state.filters.length ? (
+            <button onClick={() => setAllFilters([])}>
+              Clear filters <Icon name="close" />
+            </button>
+          ) : (
+            "Filter columns"
+          )}
+        </span>
+      </div>
+      <div
+        className={styles.tableScroll}
+        role="region"
+        aria-label="Money making methods. Scroll horizontally to see all columns."
+        tabIndex="0"
+      >
+        <table {...getTableProps()} className={styles.table}>
+          <caption className={styles.srOnly}>
+            RuneScape money making methods with hourly profit, skill, intensity,
+            notes, and video guides.
+          </caption>
+          <thead>
+            {headerGroups.map((group) => (
+              <tr
+                {...group.getHeaderGroupProps()}
+                key={group.getHeaderGroupProps().key}
+              >
+                {group.headers.map((column) => (
+                  <th
+                    {...column.getHeaderProps()}
+                    key={column.id}
+                    scope="col"
+                    aria-sort={
+                      column.isSorted
+                        ? column.isSortedDesc
+                          ? "descending"
+                          : "ascending"
+                        : "none"
+                    }
+                  >
+                    {column.canSort ? (
+                      <button
+                        {...column.getSortByToggleProps()}
+                        className={styles.sortButton}
+                        title={undefined}
+                        aria-label={"Sort by " + column.Header}
+                      >
+                        {column.render("Header")}
+                        <span aria-hidden="true">
+                          {column.isSorted ? (
+                            column.isSortedDesc ? (
+                              "↓"
+                            ) : (
+                              "↑"
+                            )
+                          ) : (
+                            <Icon name="sort" />
+                          )}
+                        </span>
+                      </button>
+                    ) : (
+                      <span className={styles.headerLabel}>
+                        {column.render("Header")}
+                      </span>
+                    )}
+                    {column.canFilter ? column.render("Filter") : null}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} key={row.id}>
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} key={cell.column.id}>
+                      {cell.render("Cell")}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+            {!rows.length ? (
+              <tr>
+                <td colSpan={columns.length} className={styles.noResults}>
+                  <Icon name="document" />
+                  <h3>
+                    {data.length ? "No matching methods" : "No methods yet"}
+                  </h3>
+                  <p>
+                    {data.length
+                      ? "Try another search, or clear your filters."
+                      : "Add a method to get started."}
+                  </p>
+                  {data.length ? (
+                    <button
+                      className="button button--outline"
+                      onClick={() => setAllFilters([])}
+                    >
+                      Clear filters
+                    </button>
+                  ) : null}
+                </td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}

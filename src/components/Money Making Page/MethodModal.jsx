@@ -1,12 +1,18 @@
-// File: src/components/MethodModal.jsx
-
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import styles from "../../Styling/MethodModal.module.css";
-
 import { parseProfitInput } from "../../utils";
+import Icon from "../Icon";
 
-Modal.setAppElement("#root");
+const emptyForm = {
+  method: "",
+  hourlyProfit: "",
+  intensity: "",
+  skillOrArea: [],
+  customSkillOrArea: "",
+  videoLink: "EDIT LATER",
+  notes: "",
+};
 
 export default function MethodModal({
   isOpen,
@@ -14,253 +20,299 @@ export default function MethodModal({
   onSave,
   defaultValues,
   intensityOptions,
-  skillOptions
+  skillOptions,
 }) {
-  const [form, setForm] = useState({
-    method: "",
-    hourlyProfit: "",
-    intensity: "",
-    skillOrArea: [],
-    customSkillOrArea: "",
-    videoLink: "EDIT LATER",
-    notes: ""
-  });
-
-  
-  // NEW: track custom options persisted in localStorage
+  const [form, setForm] = useState(emptyForm);
   const [customOptions, setCustomOptions] = useState(() => {
-    const saved = localStorage.getItem("skillOrAreaCustomOptions");
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // NEW: input for a new custom option
-  const [newCustomInput, setNewCustomInput] = useState("");
-
-  // when modal opens or defaultValues change
-  useEffect(() => {
-    if (defaultValues) {
-      setForm({
-        method: defaultValues.method || "",
-        hourlyProfit: defaultValues.hourlyProfit?.toString() || "",
-        intensity: defaultValues.intensity || "",
-        skillOrArea: defaultValues.skillOrArea
-          ? defaultValues.skillOrArea.split("/")
-          : [],
-        videoLink: defaultValues.videoLink || "EDIT LATER",
-        notes: defaultValues.notes || ""
-      });
-    } else {
-      setForm({
-        method: "",
-        hourlyProfit: "",
-        intensity: "",
-        skillOrArea: [],
-        videoLink: "EDIT LATER",
-        notes: ""
-      });
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("skillOrAreaCustomOptions") || "[]",
+      );
+      return Array.isArray(saved)
+        ? saved.filter((option) => typeof option === "string")
+        : [];
+    } catch {
+      return [];
     }
+  });
+  const [newCustomInput, setNewCustomInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  useEffect(() => {
+    const root = document.getElementById("root");
+    if (root) Modal.setAppElement(root);
+  }, []);
+
+  useEffect(() => {
+    setForm(
+      defaultValues
+        ? {
+            method: defaultValues.method || "",
+            hourlyProfit: defaultValues.hourlyProfit?.toString() || "",
+            intensity:
+              defaultValues.intensity?.intensityId ??
+              defaultValues.intensity ??
+              "",
+            skillOrArea: defaultValues.skillOrArea
+              ? defaultValues.skillOrArea.split("/")
+              : [],
+            customSkillOrArea: defaultValues.customSkillOrArea || "",
+            videoLink: defaultValues.videoLink || "EDIT LATER",
+            notes: defaultValues.notes || "",
+          }
+        : { ...emptyForm, skillOrArea: [] },
+    );
+    setNewCustomInput("");
+    setSaveError("");
   }, [defaultValues, isOpen]);
 
-    // NEW: persist customOptions whenever they change
   useEffect(() => {
-    localStorage.setItem(
-      "skillOrAreaCustomOptions",
-      JSON.stringify(customOptions)
-    );
+    try {
+      localStorage.setItem(
+        "skillOrAreaCustomOptions",
+        JSON.stringify(customOptions),
+      );
+    } catch {
+      /* Custom tags remain available in this session. */
+    }
   }, [customOptions]);
 
-  // helper to toggle a selection on/off
-  const toggleSkill = (opt) => {
-    setForm((f) => {
-      const has = f.skillOrArea.includes(opt);
-      const arr = has
-        ? f.skillOrArea.filter((x) => x !== opt)
-        : [...f.skillOrArea, opt];
-      return { ...f, skillOrArea: arr };
-    });
-  };
-
-  // NEW: handle adding a new custom option
+  const toggleSkill = (option) =>
+    setForm((previous) => ({
+      ...previous,
+      skillOrArea: previous.skillOrArea.includes(option)
+        ? previous.skillOrArea.filter((skill) => skill !== option)
+        : [...previous.skillOrArea, option],
+    }));
+  const existingOptions = defaultValues?.skillOrArea
+    ? defaultValues.skillOrArea.split("/")
+    : [];
+  const allOptions = [
+    ...new Set([...skillOptions, ...customOptions, ...existingOptions]),
+  ];
   const addCustom = () => {
-    const val = newCustomInput.trim();
-    if (!val) return;
-    const all = [...skillOptions, ...customOptions];
-    if (!all.includes(val)) {
-      setCustomOptions((prev) => [...prev, val]);
-      toggleSkill(val);
+    const option = newCustomInput.trim();
+    if (!option) return;
+    if (!allOptions.includes(option)) {
+      setCustomOptions((previous) => [...previous, option]);
+      toggleSkill(option);
+    } else if (!form.skillOrArea.includes(option)) {
+      toggleSkill(option);
     }
     setNewCustomInput("");
   };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((previous) => ({ ...previous, [name]: value }));
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (isSaving) return;
+    setIsSaving(true);
+    setSaveError("");
     const payload = {
       ...form,
       hourlyProfit: parseProfitInput(form.hourlyProfit),
       intensity: Number(form.intensity),
-      skillOrArea: form.skillOrArea.join("/")  // slash-delimited
+      skillOrArea: form.skillOrArea.join("/"),
     };
-
     try {
       await onSave(
         defaultValues
           ? { methodId: defaultValues.methodId, ...payload }
-          : payload
+          : payload,
       );
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save method");
+    } catch {
+      setSaveError("We couldn't save this method. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
-
-  // combine base + custom options
-  const allOptions = [...skillOptions, ...customOptions];
 
   return (
     <Modal
       isOpen={isOpen}
-      onRequestClose={onClose}
+      onRequestClose={isSaving ? undefined : onClose}
       className={styles.modal}
       overlayClassName={styles.overlay}
+      shouldCloseOnEsc={!isSaving}
+      shouldCloseOnOverlayClick={!isSaving}
+      aria={{
+        labelledby: "method-modal-title",
+        describedby: "method-modal-description",
+      }}
     >
-      <h2 className={styles.title}>
-        {defaultValues ? "Edit Method" : "Add Method"}
-      </h2>
+      <div className={styles.modalHeading}>
+        <div>
+          <h2 id="method-modal-title">
+            {defaultValues ? "Edit method" : "Add a method"}
+          </h2>
+        </div>
+        <button
+          type="button"
+          className={styles.closeButton}
+          aria-label="Close method dialog"
+          onClick={onClose}
+          disabled={isSaving}
+        >
+          <Icon name="close" />
+        </button>
+      </div>
+      <p id="method-modal-description" className={styles.description}>
+        Fields marked * are required.
+      </p>
       <form onSubmit={handleSubmit} className={styles.form}>
-        {/* NEW: each field wrapped in styled label */}
-        <div className={styles.label}>
-          Method *
+        <div className={styles.field}>
+          <label htmlFor="method-name">Method name *</label>
           <input
             className={styles.input}
+            id="method-name"
             name="method"
             value={form.method}
             onChange={handleChange}
+            placeholder="What will we be doing?"
             required
           />
         </div>
-
-        <div className={styles.label}>
-          Hourly Profit
-          <input
-            className={styles.input}
-            name="hourlyProfit"
-            value={form.hourlyProfit}
-            onChange={handleChange}
-            placeholder="e.g. 4.5M or 750K"
-          />
-        </div>
-
-        <div className={styles.label}>
-          Intensity *
-          <select
-            className={styles.select}
-            name="intensity"
-            value={form.intensity}
-            onChange={handleChange}
-            required
-          >
-            <option value="" disabled>Choose…</option>
-            {intensityOptions.map(({ intensityId, shortDescription, longDescription }) => (
-              <option key={intensityId} value={intensityId}>
-                {shortDescription} – {longDescription}
+        <div className={styles.fieldRow}>
+          <div className={styles.field}>
+            <label htmlFor="method-profit">Hourly profit</label>
+            <input
+              className={styles.input}
+              id="method-profit"
+              name="hourlyProfit"
+              value={form.hourlyProfit}
+              onChange={handleChange}
+              placeholder="e.g. 4.5M or 750K"
+            />
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="method-intensity">Intensity *</label>
+            <select
+              className={styles.select}
+              id="method-intensity"
+              name="intensity"
+              value={form.intensity}
+              onChange={handleChange}
+              required
+            >
+              <option value="" disabled>
+                Choose intensity
               </option>
-            ))}
-          </select>
+              {intensityOptions.map(({ intensityId, shortDescription }) => (
+                <option key={intensityId} value={intensityId}>
+                  {shortDescription}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-
-        {/* UPDATED: Skill or Area as tag buttons */}
-        <div className={styles.label}>
-          Skill or Area *
+        <fieldset className={styles.skillField}>
+          <legend>Skills &amp; area</legend>
+          <p className={styles.hint}>Choose all that apply.</p>
           <div className={styles.optionsList}>
-            {allOptions.map((opt) => (
+            {allOptions.map((option) => (
               <button
-                key={opt}
+                key={option}
                 type="button"
+                aria-pressed={form.skillOrArea.includes(option)}
                 className={
-                  form.skillOrArea.includes(opt)
+                  form.skillOrArea.includes(option)
                     ? styles.optionSelected
                     : styles.option
                 }
-                onClick={() => toggleSkill(opt)}
+                onClick={() => toggleSkill(option)}
               >
-                {opt}
+                {form.skillOrArea.includes(option) ? (
+                  <Icon name="check" />
+                ) : null}
+                {option}
               </button>
             ))}
           </div>
-
-          {/* NEW: allow entering a new custom option */}
           <div className={styles.customInputRow}>
             <input
               className={styles.input}
-              placeholder="Custom skill or area"
+              aria-label="Add a custom skill or area"
+              placeholder="Add a custom skill or area"
               value={newCustomInput}
-              onChange={(e) => setNewCustomInput(e.target.value)}
+              onChange={(event) => setNewCustomInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  addCustom();
+                }
+              }}
             />
             <button
               type="button"
               className={styles.addButton}
+              aria-label="Add custom skill"
               onClick={addCustom}
             >
-              +
+              <Icon name="plus" />
             </button>
           </div>
-        </div>
-
-        {/* NEW: show this field only when “Custom” selected */}
-        {form.skillOrArea.includes("Custom") && (
-          <div className={styles.label}>
-            Custom Skill or Area *
+        </fieldset>
+        {form.skillOrArea.includes("Custom") ? (
+          <div className={styles.field}>
+            <label htmlFor="method-custom">Custom skill or area *</label>
             <input
               className={styles.input}
-              type="text"
+              id="method-custom"
               name="customSkillOrArea"
-              placeholder="Enter custom skill or area"
               value={form.customSkillOrArea}
               onChange={handleChange}
               required
             />
           </div>
-        )}
-
-        <div className={styles.label}>
-          Video Link
+        ) : null}
+        <div className={styles.field}>
+          <label htmlFor="method-video">Video guide</label>
           <input
             className={styles.input}
+            id="method-video"
             name="videoLink"
             value={form.videoLink}
             onChange={handleChange}
+            placeholder="Link to a video guide"
           />
         </div>
-
-        <div className={styles.label}>
-          Notes
+        <div className={styles.field}>
+          <label htmlFor="method-notes">Notes</label>
           <textarea
             className={styles.textarea}
+            id="method-notes"
             name="notes"
             value={form.notes}
             onChange={handleChange}
+            placeholder="Requirements, tips, or anything worth knowing…"
+            rows="3"
           />
         </div>
-
+        {saveError ? (
+          <p className={styles.error} role="alert">
+            <Icon name="alert" />
+            {saveError}
+          </p>
+        ) : null}
         <div className={styles.buttons}>
           <button
             type="button"
             className={styles.cancelButton}
             onClick={onClose}
+            disabled={isSaving}
           >
             Cancel
           </button>
           <button
             type="submit"
             className={styles.saveButton}
+            disabled={isSaving}
           >
-            Save
+            {isSaving ? "Saving…" : "Save method"}
+            <Icon name="arrow" />
           </button>
         </div>
       </form>

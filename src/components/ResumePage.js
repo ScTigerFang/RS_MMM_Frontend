@@ -1,4 +1,5 @@
-import React from "react";
+import { useEffect } from "react";
+import Icon from "./Icon";
 import "../Styling/ResumePage.css";
 import {
   personalInfo,
@@ -6,80 +7,177 @@ import {
   skills,
   experiences,
   education,
-} from "../data/resumeData"; // Adjust the path as necessary
+  independentProjects,
+  communityContributions,
+} from "../data/resumeData";
 
-function ResumePage() {
+const skillGroups = skills.reduce(
+  (groups, skill) => {
+    const index =
+      /^(C#|React|Next\.js|Java|TypeScript|HTML|Cobol|PowerShell|Python)/i.test(
+        skill,
+      )
+        ? 0
+        : /^(\.NET|Entity Framework|SQL|NoSQL|Spring Boot|Node\.js|GraphQL|AWS|Kafka|Rules Engine|Application Programming|Microsoft Azure|Solution Architecture)/i.test(
+              skill,
+            )
+          ? 1
+          : 2;
+    groups[index].items.push(skill);
+    return groups;
+  },
+  [
+    { title: "Languages & interfaces", items: [] },
+    { title: "Platforms & architecture", items: [] },
+    { title: "Delivery & teamwork", items: [] },
+  ],
+);
+
+function SectionHeading({ title }) {
+  return <h2 className="resume-section-heading">{title}</h2>;
+}
+
+function Contribution({ text }) {
+  const separator = text.indexOf(":");
+  if (separator < 0) return <li>{text}</li>;
   return (
-    <div className="resume-container">
-      <header className="resume-header">
-        <h1>{personalInfo.name}</h1>
-        <p>
-          Email: {personalInfo.email} | Phone: {personalInfo.phone}
-        </p>
-        <p>
-          LinkedIn:{" "}
-          <a href={personalInfo.linkedIn}>
-            {personalInfo.name} {personalInfo.location}
-          </a>
-        </p>
-      </header>
-
-      <section className="professional-overview">
-        <h2>Professional Overview</h2>
-        <p>{professionalOverview}</p>
-      </section>
-
-      <section className="skills">
-        <h2>Skills</h2>
-        <ul className="skills-list">
-          {skills.map((skill, index) => (
-            <li key={index}>{skill}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="experience">
-        <h2>Experience</h2>
-        {experiences.map((exp, index) => (
-          <article key={index}>
-            <h3>
-              {exp.role} - {exp.company}
-            </h3>
-            <p>{exp.duration}</p>
-            <div className="experience-skills">
-              <h4>Skills Utilized</h4>
-              <ul className="experience-skills-list">
-                {exp.skills.map((skill, sIndex) => (
-                  <li key={sIndex}>{skill}</li>
-                ))}
-              </ul>
-            </div>
-            <p>{exp.overview}</p>
-            <ul>
-              {exp.contributions.map((contribution, cIndex) => (
-                <li key={cIndex}>{contribution}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </section>
-
-      <section className="education">
-        <h2>Education</h2>
-        {education.map((edu, index) => (
-          <p key={index}>
-            {edu.school}
-            <p> {edu.duration}</p>
-            <p>{edu.degree}</p>
-          </p>
-        ))}
-      </section>
-
-      <footer className="resume-footer">
-        <p>Last updated on: {new Date().toLocaleDateString()}</p>
-      </footer>
-    </div>
+    <li>
+      <strong>{text.slice(0, separator + 1)}</strong>
+      {text.slice(separator + 1)}
+    </li>
   );
 }
 
-export default ResumePage;
+export default function ResumePage() {
+  useEffect(() => {
+    const previousTitle = document.title;
+    document.title = personalInfo.name + " - Resume";
+    return () => {
+      document.title = previousTitle;
+    };
+  }, []);
+
+  return (
+    <div className="resume-page">
+      <div className="resume-toolbar">
+        <button className="resume-print" onClick={() => window.print()}>
+          <Icon name="print" /> Print / save PDF
+        </button>
+      </div>
+      <p className="resume-print-help">
+        For PDF: use Letter paper, 100% scale, and turn off browser headers and
+        footers.
+      </p>
+      <article
+        className="resume-document"
+        aria-label={personalInfo.name + " resume"}
+      >
+        <header className="resume-hero">
+          <h1>{personalInfo.name}</h1>
+          <p className="resume-role">{personalInfo.title}</p>
+          <address className="resume-contact">
+            <span>{personalInfo.location}</span>
+            <a href={"mailto:" + personalInfo.email}>{personalInfo.email}</a>
+            <a href={"tel:" + personalInfo.phone.replace(/[^\d+]/g, "")}>
+              {personalInfo.phone}
+            </a>
+            <a href={personalInfo.linkedIn} target="_blank" rel="noreferrer">
+              {personalInfo.linkedIn
+                .replace(/^https?:\/\/(www\.)?/, "")
+                .replace(/\/$/, "")}
+            </a>
+            <a href={personalInfo.resumeUrl} target="_blank" rel="noreferrer">
+              {personalInfo.resumeUrl.replace(/^https?:\/\//, "")}
+            </a>
+          </address>
+        </header>
+        <section className="resume-section" id="overview">
+          <SectionHeading title="Professional overview" />
+          <p className="resume-overview">{professionalOverview}</p>
+        </section>
+        <section className="resume-section" id="experience">
+          <SectionHeading title="Experience" />
+          {experiences.map((exp) => (
+            <article
+              className="experience-entry"
+              key={exp.company + exp.role + exp.duration}
+            >
+              <div className="experience-topline">
+                <h3>
+                  {exp.role}
+                  <span className="experience-company"> | {exp.company}</span>
+                </h3>
+                <p className="experience-date">{exp.duration}</p>
+              </div>
+              {exp.overview && (
+                <p className="experience-overview">{exp.overview}</p>
+              )}
+              {exp.contributions.length > 0 && (
+                <ul className="experience-contributions">
+                  {exp.contributions.map((text) => (
+                    <Contribution text={text} key={text} />
+                  ))}
+                </ul>
+              )}
+              <ul
+                className="experience-tools"
+                aria-label={"Technologies and skills at " + exp.company}
+              >
+                {exp.skills.map((skill) => (
+                  <li key={skill}>{skill}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </section>
+        <section className="resume-section" id="projects">
+          <SectionHeading title="Independent projects & community" />
+          <ul className="resume-projects">
+            {independentProjects.map((project) => (
+              <li key={project.url}>
+                <p>
+                  <strong>{project.name} | {project.role}:</strong>{" "}
+                  {project.description}
+                </p>
+                <a href={project.url} target="_blank" rel="noreferrer">
+                  {project.linkLabel}
+                </a>
+              </li>
+            ))}
+            <Contribution text={communityContributions} />
+          </ul>
+        </section>
+        <section className="resume-section" id="skills">
+          <SectionHeading title="Skills & tools" />
+          <div className="resume-toolkit">
+            {skillGroups.map((group) => (
+              <div className="toolkit-group" key={group.title}>
+                <h3>{group.title}</h3>
+                <ul>
+                  {group.items.map((skill) => (
+                    <li key={skill}>{skill}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="resume-section" id="education">
+          <SectionHeading title="Education" />
+          {education.map((edu) => (
+            <article
+              className="education-entry"
+              key={edu.school + edu.duration}
+            >
+              <div>
+                <h3>{edu.school}</h3>
+                <p>{edu.degree}</p>
+              </div>
+              <span>{edu.duration}</span>
+            </article>
+          ))}
+        </section>
+      </article>
+    </div>
+  );
+}

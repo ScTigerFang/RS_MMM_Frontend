@@ -1,120 +1,322 @@
-/* src/components/MethodsTable.module.css */
-.table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.tableHeader {
-  background-color: #4a4a4a;
-  font-size: large;
-  color: #e5ff00;
-  font-weight: bold;
-  padding: 0.5rem;
-  text-align: center;
-  /* border: 1px solid #ddd; */
-  border-radius: 25px 25px 5px 5px;
-}
-
-.tableRow:nth-child(odd) {
-  background-color: #f9f9f9;
-}
-
-.tableRow:nth-child(even) {
-  background-color: #ffffff;
-}
-
-.tableCell {
-  padding: 1rem;
-  vertical-align: top;
-  border: 1px solid #ddd;
-}
-
-.sortIcon {
-  display: inline-block;
-  margin-left: 0.5rem;
-}
-
-.tooltip {
-  position: absolute;
-  z-index: 1;
-  visibility: hidden;
-  width: 300px;
-  padding: 5px;
-  background-color: #000000;
-  color: #eeff00;
-  border-radius: 6px;
-  text-align: left;
-  font-size: 0.8rem;
-  opacity: 0.8;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.intensityCell {
-  position: relative;
-  cursor: pointer;
-}
-
-.intensityCell:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* NEW: primary button for “Add” & “Edit” */
-.primaryButton {
-  background: #e5ff00;
-  color: #4a4a4a;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.primaryButton:hover {
-  opacity: 0.9;
-}
-
-/* Solid highlight for newest row (no transparency) */
-.tableRow.rowNew {
-  background-color: #fffce1;          /* soft light-yellow */
-  border-left: 6px solid #e5ff00;      /* accent bar */
-  box-shadow: inset 0 0 0 1px #e8e8e8; /* crisp edge */
-}
-
-/* Make text + links pop on the highlighted row */
-.tableRow.rowNew .tableCell {
-  color: #1f2937;            /* darker text for contrast */
-}
-.tableRow.rowNew a {
-  color: #1e3a8a;            /* readable link color on light bg */
-  font-weight: 700;
-  text-decoration: underline;
-}
-
-/* Method cell + badge: stronger contrast on light-yellow row */
-.methodCell {
-  display: inline-flex;
+.tableToolbar {
+  padding: 15px 28px;
+  border-bottom: 1px solid #82959c20;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  gap: 20px;
+  font-size: 11px;
+  color: #96a8b0;
+}
+.tableToolbar > span:last-child {
+  color: #8c9fa8;
+}
+.tableToolbar button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  color: #e4c382;
+  background: none;
+  font-size: 11px;
+}
+.tableToolbar button svg {
+  width: 13px;
+  height: 13px;
+}
+.tableScroll {
+  max-width: 100%;
+  overflow: auto;
+  scrollbar-color: #5b686b #182730;
+  scrollbar-width: thin;
+}
+.tableScroll:focus-visible {
+  outline-offset: -4px;
+}
+.table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+.table th {
+  padding: 19px 16px 17px;
+  color: #bdc6c9;
+  background: #14222b;
+  vertical-align: top;
+  font-size: 10px;
+  font-weight: 650;
+  border-bottom: 1px solid #3c4b4f;
+}
+.table th:first-child,
+.table td:first-child {
+  padding-left: 26px;
+  color: #84979f;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.table th:first-child {
+  width: 52px;
+}
+.table th:nth-child(2) {
+  min-width: 180px;
+}
+.table th:nth-child(3) {
+  min-width: 145px;
+}
+.table th:nth-child(4) {
+  min-width: 125px;
+}
+.table th:nth-child(5) {
+  min-width: 140px;
+}
+.table th:nth-child(6) {
+  width: 28%;
+  min-width: 220px;
+}
+.table th:nth-child(7) {
+  min-width: 135px;
+}
+.table th:last-child,
+.table td:last-child {
+  width: 92px;
+  min-width: 92px;
+}
+.sortButton {
+  width: 100%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  color: inherit;
+  background: none;
+  text-align: left;
+  font-size: inherit;
+  font-weight: inherit;
+}
+.sortButton > span {
+  color: #a79469;
+}
+.sortButton svg {
+  width: 12px;
+  height: 12px;
+}
+.headerLabel {
+  display: block;
+  line-height: 15px;
+}
+.filter {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-top: 12px;
+  padding: 8px 9px;
+  color: #d6dfdf;
+  background: #0e1c24;
+  border: 1px solid #3c4e55;
+  border-radius: 4px;
+  font-size: 10px;
+}
+.filter::placeholder {
+  color: #8598a1;
+}
+.table td {
+  padding: 21px 16px;
+  border-bottom: 1px solid #81959b1c;
+  vertical-align: top;
+  line-height: 1.8;
+  color: #aabac1;
+  overflow-wrap: anywhere;
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.table tbody tr {
+  background: #1b2b35;
+}
+.table tbody tr:nth-child(even) {
+  background: #192832;
+}
+.table tbody tr:hover {
+  background: #22343d;
+}
+.methodCell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: #e4e9e7;
+  font-size: 12px;
+  font-weight: 600;
 }
 .badge {
-  font-size: 0.8rem;
-  font-weight: 800;
-  padding: 0.15rem 0.45rem;
-  border-radius: 9999px;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  user-select: none;
+  padding: 2px 5px;
+  color: #dfc582;
+  background: #e0bd7212;
+  border: 1px solid #e0bd7240;
+  border-radius: 3px;
+  font-size: 8px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
-.badgeNew {
-  background: rgb(255, 0, 0);   /* dark pill */
-  color: lab(100% 0.01 -0.01);        /* brand yellow text */
-  box-shadow: 0 0 0 2px #fffce1; /* subtle ring to blend with row */
+.profit {
+  white-space: nowrap;
+  color: #eed191;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
-
-/* Optional: emphasize the Method text on the newest row */
-.tableRow.rowNew .methodCell > span:first-child {
-  font-weight: 800;
-  color: #111827;
-  text-shadow: 0 1px 0 rgba(255,255,255,.6);
+.profit small {
+  display: block;
+  color: #8e9fa6;
+  font-size: 9px;
+  font-weight: 400;
 }
-
+.intensityCell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px;
+  color: var(--intensity-color, #c2cbd2);
+  background: var(--intensity-background, #2b3842);
+  border: 1px solid var(--intensity-border, #566570);
+  border-radius: 4px;
+  font-size: 10px;
+}
+.intensityCell[data-intensity-level="1"] {
+  --intensity-color: #9fe5b8;
+  --intensity-background: #1e4036;
+  --intensity-border: #426951;
+}
+.intensityCell[data-intensity-level="2"] {
+  --intensity-color: #8be0d8;
+  --intensity-background: #193d40;
+  --intensity-border: #35676a;
+}
+.intensityCell[data-intensity-level="3"] {
+  --intensity-color: #9dccff;
+  --intensity-background: #20374f;
+  --intensity-border: #3f6080;
+}
+.intensityCell[data-intensity-level="4"] {
+  --intensity-color: #f4d38b;
+  --intensity-background: #493b22;
+  --intensity-border: #80653c;
+}
+.intensityCell[data-intensity-level="5"] {
+  --intensity-color: #ffb3ae;
+  --intensity-background: #4b2d33;
+  --intensity-border: #87535a;
+}
+.intensityDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.tooltip {
+  display: none;
+  position: absolute;
+  left: -45px;
+  top: calc(100% + 8px);
+  z-index: 5;
+  width: 200px;
+  padding: 13px;
+  border: 1px solid #53665d;
+  border-radius: 4px;
+  background: #0f1d24;
+  color: #d3ddcf;
+  line-height: 1.7;
+  box-shadow: 0 5px 20px #0005;
+}
+.intensityCell:hover .tooltip,
+.intensityCell:focus .tooltip {
+  display: block;
+}
+.guideCell {
+  display: grid;
+  gap: 7px;
+  font-size: 10px;
+}
+.guideCell a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #d2bc87;
+  text-decoration: none;
+}
+.guideCell a:hover {
+  text-decoration: underline;
+}
+.guideCell svg {
+  width: 11px;
+  height: 11px;
+}
+.editButton {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 9px;
+  background: transparent;
+  border: 1px solid #5e70724f;
+  border-radius: 4px;
+  color: #ccd4cf;
+  font-size: 10px;
+}
+.editButton:hover {
+  border-color: #d8bd7d;
+  color: #efd393;
+}
+.editButton svg {
+  width: 12px;
+  height: 12px;
+}
+.table .noResults {
+  padding: 60px 25px;
+  text-align: center;
+  color: #b5c3c6;
+}
+.noResults > svg {
+  color: #c6b07d;
+  width: 26px;
+  height: 26px;
+}
+.noResults h3 {
+  margin-top: 14px;
+  color: #e4dac0;
+  font-size: 17px;
+}
+.noResults p {
+  margin: 12px 0 20px;
+  font-size: 12px;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 600px) {
+  .tableToolbar {
+    padding: 15px 20px;
+  }
+  .tableToolbar > span:last-child {
+    max-width: 140px;
+    text-align: right;
+    line-height: 1.5;
+    font-size: 10px;
+  }
+}

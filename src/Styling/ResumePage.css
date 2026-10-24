@@ -1,95 +1,454 @@
-.resume-container {
-  max-width: 800px;
+.resume-page {
+  max-width: 920px;
   margin: auto;
-  padding: 20px;
-  font-family: "RuneScape UF", Arial, sans-serif;
+  padding: 26px 32px 50px;
 }
-
-.resume-header h1 {
-  margin-bottom: 0;
+.resume-toolbar {
+  max-width: 816px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  color: #53645c;
+  font-size: 12px;
 }
-
-.resume-header p {
+.resume-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  color: #f4f2ec;
+  background: #2b4941;
+  border: 1px solid #2b4941;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.resume-print:hover {
+  background: #3b5c4b;
+}
+.resume-print .icon {
+  width: 16px;
+  height: 16px;
+}
+.resume-print-help {
+  max-width: 816px;
+  margin: 13px auto 20px;
+  color: #64705f;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.resume-document {
+  max-width: 816px;
+  margin: auto;
+  padding: 38px 42px;
+  background: #fff;
+  color: #273632;
+  border: 1px solid #d9ddd3;
+  box-shadow: 0 5px 22px #263a3010;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.resume-hero {
+  padding-bottom: 15px;
+  border-bottom: 2px solid #394f46;
+}
+.resume-hero h1 {
+  font: 42px/1.15 var(--display-font);
+  color: #233b35;
+  letter-spacing: -0.025em;
+}
+.resume-role {
+  margin-top: 7px;
+  color: #3b5148;
+  font-size: 15px;
+  font-weight: 600;
+}
+.resume-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 15px;
+  margin-top: 11px;
+  font-style: normal;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #4e5b52;
+}
+.resume-contact a {
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.resume-contact a:hover {
+  text-decoration: underline;
+}
+.resume-section {
+  margin-top: 20px;
+  scroll-margin-top: 24px;
+}
+.resume-section-heading {
+  padding-bottom: 5px;
+  margin-bottom: 9px;
+  border-bottom: 1px solid #bfc8ba;
+  color: #2d453a;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.065em;
+}
+.resume-overview {
+  color: #445149;
+}
+.experience-entry {
+  margin-top: 16px;
+}
+.experience-entry:first-of-type {
+  margin-top: 0;
+}
+.experience-topline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 3px 14px;
+}
+.experience-topline h3 {
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 700;
+  color: #283d34;
+}
+.experience-company {
+  font-weight: 600;
+}
+.experience-date {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #54634f;
+  white-space: nowrap;
+}
+.experience-overview {
   margin-top: 5px;
+  color: #46524a;
 }
-
-.skills ul,
-.experience ul {
-  list-style-type: none;
-  padding-left: 0;
+.experience-contributions {
+  margin: 6px 0;
+  padding-left: 17px;
+  color: #46524a;
 }
-
-.experience article {
-  margin-bottom: 20px;
+.experience-contributions li {
+  margin-bottom: 3px;
+  padding-left: 2px;
 }
-
-.resume-footer {
-  text-align: center;
-  margin-top: 40px;
+.experience-contributions strong {
+  color: #35463b;
+  font-weight: 600;
 }
-
+.experience-tools {
+  margin: 7px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #5d694f;
+}
+.experience-tools::before {
+  content: "Skills: ";
+  font-weight: 600;
+}
+.experience-tools li {
+  display: inline;
+}
+.experience-tools li:not(:last-child)::after {
+  content: " · ";
+  color: #74816b;
+}
+.resume-projects {
+  margin: 0;
+  padding-left: 17px;
+  color: #46524a;
+}
+.resume-projects li {
+  margin-bottom: 9px;
+  padding-left: 2px;
+  break-inside: avoid;
+}
+.resume-projects strong {
+  color: #35463b;
+  font-weight: 600;
+}
+.resume-projects a {
+  color: #3b5148;
+  font-size: 11px;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+.resume-toolkit {
+  display: grid;
+  gap: 8px;
+}
+.toolkit-group h3 {
+  display: inline;
+  margin-right: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #354b3e;
+}
+.toolkit-group h3::after {
+  content: ":";
+}
+.toolkit-group ul {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #4c594c;
+}
+.toolkit-group li {
+  display: inline;
+}
+.toolkit-group li:not(:last-child)::after {
+  content: "; ";
+}
+.education-entry {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+.education-entry h3 {
+  font-size: 13px;
+  font-weight: 650;
+  color: #334637;
+}
+.education-entry p {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #4c5a4c;
+}
+.education-entry > span {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #56614e;
+}
+@media (max-width: 600px) {
+  .resume-page {
+    padding: 20px 16px 30px;
+  }
+  .resume-document {
+    padding: 27px 23px;
+    font-size: 13px;
+  }
+  .resume-hero h1 {
+    font-size: 37px;
+  }
+  .resume-contact {
+    flex-direction: column;
+    gap: 3px;
+  }
+  .experience-topline {
+    display: block;
+  }
+  .experience-date {
+    margin-top: 3px;
+  }
+  .education-entry {
+    flex-direction: column;
+    gap: 5px;
+  }
+  .resume-print-help {
+    font-size: 10px;
+  }
+}
+@page {
+  size: letter portrait;
+  margin: 0.5in;
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font:
+      8pt Arial,
+      sans-serif;
+    color: #666;
+  }
+}
 @media print {
-  body {
-    -webkit-print-color-adjust: exact;
+  :root,
+  html,
+  body,
+  #root,
+  .site-shell,
+  .site-shell--resume {
+    background: #fff !important;
+    color: #222;
+    min-height: 0;
+    height: auto;
   }
-  .resume-container {
-    width: 100%;
+  .site-shell,
+  .site-main {
+    display: block;
   }
-}
-/* Skills display inline with separators, and experience contributions with bullet points */
-.skills ul,
-.experience ul,
-.skills-list,
-.experience-skills-list {
-  list-style-type: none; /* Remove bullet points */
-  padding-left: 0;
-}
-
-/* Skills list displayed inline with separators */
-.skills-list li,
-.experience-skills-list li {
-  display: inline; /* Display skills inline */
-  margin-right: 10px; /* Space between skills */
-}
-
-/* Adding a separator after each skill except the last one */
-/* Adjusting the separator's appearance */
-.skills-list li::after,
-.experience-skills-list li::after {
-  content: "•"; /* Changed to a bullet for a bit more visibility */
-  margin-left: 5px;
-  font-size: 1.2em; /* Make the dot larger than the surrounding text */
-  vertical-align: middle; /* Align it with the middle of the text */
-}
-
-.skills-list li:last-child::after,
-.experience-skills-list li:last-child::after {
-  content: ""; /* No separator after the last skill */
-}
-
-/* Ensure contributions are still displayed with bullet points */
-.experience ul {
-  list-style-type: disc; /* Restore bullet points for contributions */
-  padding-left: 20px; /* Indent contributions */
-}
-
-/* Adjusting general and specific spacings for readability */
-section {
-  margin-bottom: 20px; /* Better separation between sections */
-}
-
-p,
-li {
-  margin-bottom: 10px; /* Spacing for readability */
-}
-
-.experience article {
-  margin-bottom: 30px; /* Space between each experience section */
-}
-
-.experience h3,
-.experience-skills,
-.experience p,
-.experience ul {
-  margin-top: 15px; /* Uniform space above elements within experiences */
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .resume-toolbar,
+  .resume-print-help {
+    display: none !important;
+  }
+  .resume-page {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+  .resume-document {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    color: #222;
+    font:
+      10pt/1.3 Arial,
+      Helvetica,
+      sans-serif;
+  }
+  .resume-document * {
+    text-shadow: none;
+  }
+  .resume-hero {
+    padding-bottom: 10pt;
+    border-bottom: 1pt solid #333;
+    break-inside: avoid;
+  }
+  .resume-hero h1 {
+    font:
+      26pt/1.1 Georgia,
+      "Times New Roman",
+      serif;
+    color: #111;
+    letter-spacing: -0.3pt;
+  }
+  .resume-role {
+    margin-top: 4pt;
+    color: #222;
+    font-size: 11pt;
+  }
+  .resume-contact {
+    display: flex;
+    flex-direction: row;
+    gap: 2pt 12pt;
+    margin-top: 7pt;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    color: #333;
+  }
+  .resume-contact a {
+    color: #333;
+    text-decoration: none;
+  }
+  .resume-section {
+    margin-top: 11pt;
+  }
+  .resume-section-heading {
+    margin-bottom: 7pt;
+    padding-bottom: 3pt;
+    border-color: #999;
+    color: #222;
+    font-size: 10pt;
+    break-after: avoid;
+  }
+  .resume-overview,
+  .experience-overview,
+  .experience-contributions {
+    color: #222;
+    orphans: 3;
+    widows: 3;
+  }
+  .experience-entry {
+    margin-top: 9pt;
+    break-inside: avoid;
+  }
+  .experience-topline {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10pt;
+    break-after: avoid;
+  }
+  .experience-topline h3 {
+    color: #111;
+    font-size: 10pt;
+  }
+  .experience-date {
+    margin-top: 0;
+    color: #333;
+    font-size: 8.5pt;
+  }
+  .experience-overview {
+    margin-top: 4pt;
+  }
+  .experience-contributions {
+    margin: 4pt 0;
+    padding-left: 12pt;
+  }
+  .experience-contributions li {
+    margin-bottom: 2pt;
+    break-inside: avoid;
+  }
+  .experience-contributions strong {
+    color: #222;
+  }
+  .experience-tools {
+    margin-top: 5pt;
+    color: #444;
+    font-size: 8.5pt;
+    line-height: 1.4;
+  }
+  .experience-tools li:not(:last-child)::after {
+    content: "; ";
+    color: #444;
+  }
+  .resume-toolkit {
+    display: block;
+  }
+  .resume-projects {
+    padding-left: 12pt;
+    color: #222;
+  }
+  .resume-projects li {
+    margin-bottom: 5pt;
+  }
+  .resume-projects strong,
+  .resume-projects a {
+    color: #222;
+  }
+  .resume-projects a {
+    font-size: 8.5pt;
+  }
+  .toolkit-group {
+    margin-top: 5pt;
+    break-inside: avoid;
+  }
+  .toolkit-group h3,
+  .toolkit-group ul {
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #222;
+  }
+  .education-entry {
+    display: flex;
+    flex-direction: row;
+    break-inside: avoid;
+  }
+  .education-entry h3 {
+    color: #222;
+    font-size: 10pt;
+  }
+  .education-entry p {
+    margin-top: 3pt;
+    color: #333;
+    font-size: 9pt;
+  }
+  .education-entry > span {
+    color: #333;
+    font-size: 8.5pt;
+  }
 }

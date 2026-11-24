@@ -1,8 +1,8 @@
 # RS MMM Frontend
 
-React website containing a personal homepage, a professional resume, and a RuneScape Money Making Methods tracker. The tracker displays profit and intensity information and supports filtering, sorting, adding, and editing methods.
+React website containing the TigerFang homepage and a RuneScape Money Making Methods tracker. Visitors can browse, filter, and sort methods. Adding and editing methods requires the owner's Google sign-in and API authorization. Visitors can request a résumé by email; the résumé itself is not published on the site.
 
-Live site: [www.the-tigerfang.com](https://www.the-tigerfang.com/). Live resume: [www.the-tigerfang.com/resume](https://www.the-tigerfang.com/resume). The domain was purchased through GoDaddy; Azure Static Web Apps hosts the frontend.
+Live site: [www.the-tigerfang.com](https://www.the-tigerfang.com/). The domain was purchased through GoDaddy; Azure Static Web Apps hosts the frontend.
 
 ## Quick start
 
@@ -21,65 +21,52 @@ npm start
 | Page | Local URL | Needs the API? |
 | --- | --- | --- |
 | Home | [http://localhost:3000/](http://localhost:3000/) | No |
-| Resume | [http://localhost:3000/resume](http://localhost:3000/resume) | No |
 | RuneScape methods | [http://localhost:3000/rs_MMM](http://localhost:3000/rs_MMM) | Yes |
 
-The resume can be edited and previewed without starting the backend or connecting to SQL Server. Its plain background is independent of the RuneScape artwork on the other pages.
+The homepage and résumé request links work without starting the backend or connecting to SQL Server. Existing `/resume` URLs, including subpaths, redirect to the homepage.
 
 ## Environment configuration
 
-The repository's `.env` supplies the background-image list. To override it locally, create an ignored `.env.local` file beside `package.json`:
+The repository's `.env` supplies the background-image list. Use `.env.example` as a reference and create an ignored `.env.local` file beside `package.json` for local overrides:
 
 ```dotenv
 REACT_APP_BACKGROUND_IMAGES=/image/1.jpg,/image/3.jpg,/image/4.jpg,/image/5.jpg,/image/6.jpg,/image/7.jpg
 REACT_APP_VERSION=0.1.3
+REACT_APP_API_URL=https://rsmmmapi.azurewebsites.net
+REACT_APP_GOOGLE_CLIENT_ID=
 ```
 
 | Variable | Purpose |
 | --- | --- |
 | `REACT_APP_BACKGROUND_IMAGES` | Optional comma-separated image URLs for the RuneScape page. An empty or missing value falls back to the bundled images 3, 4, and 6. Files under `public/image/` are served as `/image/...`. |
 | `REACT_APP_VERSION` | Optional version label in the site footer. The deployment workflow reads it from `package.json`. |
+| `REACT_APP_API_URL` | API base URL shared by data requests, mutations, and session verification through `src/config/api.js`. Defaults to `https://rsmmmapi.azurewebsites.net` when missing or empty. |
+| `REACT_APP_GOOGLE_CLIENT_ID` | Public Google OAuth Web client ID. When missing or empty, owner sign-in and editing controls stay hidden. |
 
-Restart `npm start` after changing environment files. React environment values are included in the browser bundle, so they must not contain database credentials or other secrets. Local overrides are not available to GitHub Actions; deployment needs the checked-in `.env` or equivalent workflow configuration.
+Restart `npm start` after changing environment files. React environment values are included in the browser bundle, so they must not contain database credentials, client secrets, or the owner allowlist. Local overrides are not available to GitHub Actions. The deployment workflow reads the GitHub repository variables `REACT_APP_API_URL` and `REACT_APP_GOOGLE_CLIENT_ID` at build time.
 
-## Editing the resume
+## Résumé privacy and requests
 
-| File | What to change |
-| --- | --- |
-| [src/data/resumeData.js](src/data/resumeData.js) | Contact information, live resume URL, professional overview, skills, experience, independent projects, community contributions, and education. |
-| [src/components/ResumePage.js](src/components/ResumePage.js) | Section structure and rendered markup. |
-| [src/Styling/ResumePage.css](src/Styling/ResumePage.css) | Resume typography, spacing, lists, and print styles. |
-| [src/App.js](src/App.js) | Navigation and page routes. |
-| [src/App.css](src/App.css) and [src/index.css](src/index.css) | Shared styles that can also affect the resume. |
+The public header, footer, page title, and web app manifest use **TigerFang** without the owner's full name. The public résumé page and its personal details are removed from the application. Routes matching `/resume/*` redirect to the homepage.
 
-With `npm start` running, edit these files and inspect `/resume`. Career history and skills remain in `resumeData.js`. The resume is presented as a document, with a separate print stylesheet that removes the site navigation, footer, controls, and artwork.
+**Request résumé** links use the `mailto:` URL defined in `src/config/contact.js`. The owner explicitly chose the professional email address used there. Clicking a link opens the visitor's email application; it does not automatically send a message or deliver a résumé. The recipient address is visible in the link and browser bundle.
 
-`personalInfo.title` controls the professional title beneath the name. Experience entries appear in array order, with the current Pella Corporation role first. Keep contributions focused on achievements; an empty `overview` or `contributions` array is supported when it would repeat other details. Pella includes the existing Order Management Console work and the rules-engine migration, interim and long-term designs, and custom AI tooling. The summary and skills reflect this current work.
+The original résumé component, stylesheet, and data are preserved locally under the Git-ignored `private-resume/src/` directory, with their original relative paths. They are outside the application source tree, are not imported by the app, and are not deployed. This local copy is not included in fresh clones. Keep personal résumé content out of `src/` and `public/` when changing the site.
 
-The home and RuneScape pages use dark blue panels, gold accents, the existing artwork, and the `RuneScape UF` display font when installed (with a Georgia fallback). The resume uses a plain white document and keeps the display font for its name on screen. Printing uses Georgia for the name and Arial for body text, with black text, visible contact details, and page numbers. Shared navigation and footer styles are in `src/App.css`; method-page layout styles are in `src/Styling/MethodsPage.css`.
+Removing these files from the current application does not erase earlier Git commits, previously deployed content, or copies already held by browsers and search engines. The updated site must be deployed before visitors receive the change.
 
-The header uses the supplied transparent logo at `public/image/tigerfang-logo.png` and the name **TigerFang**. The resume toolbar contains the print button without repeating the navigation breadcrumb. The methods page opens directly into the table panel, with an animated loading ring and skeleton rows while either API request is pending. Loading animations respect reduced-motion preferences. Intensity badge colors follow the API IDs: 1 / Super AFK (green), 2 / AFK (teal), 3 / Chill (blue), 4 / Focused (amber), and 5 / Super Engaging (coral). Labels remain visible, and unknown IDs use a neutral badge.
+## Appearance
+
+The home and RuneScape pages use dark blue panels, gold accents, the existing artwork, and the `RuneScape UF` display font when installed (with a Georgia fallback). Shared navigation and footer styles are in `src/App.css`; method-page layout styles are in `src/Styling/MethodsPage.css`.
+
+The header uses the supplied transparent logo at `public/image/tigerfang-logo.png` and the name **TigerFang**. The methods page opens directly into the table panel, with an animated loading ring and skeleton rows while either API request is pending. Loading animations respect reduced-motion preferences. Intensity badge colors follow the API IDs: 1 / Super AFK (green), 2 / AFK (teal), 3 / Chill (blue), 4 / Focused (amber), and 5 / Super Engaging (coral). Labels remain visible, and unknown IDs use a neutral badge.
 
 Browser and mobile icons use a transparent crowned white tiger derived from the supplied logo. The `public/tigerfang-icon-*.png` sizes serve browser tabs, Apple touch icons, and the web app manifest; `public/tigerfang-favicon.ico` includes 16 through 256 pixel sizes. `public/favicon.ico` is the matching fallback for browsers that request the conventional path. The full header artwork remains at `public/image/tigerfang-logo.png`.
-
-### Printing or saving the resume as a PDF
-
-1. Open `/resume` and click **Print / save PDF** (or use the browser's Print command).
-2. Choose **Save as PDF** or your printer.
-3. Use **Letter**, **Portrait**, **100% scale**, and **Default margins**. The stylesheet supplies half-inch page margins.
-4. Turn off the browser's **Headers and footers** so it does not add the site URL or date.
-5. Check every page in the preview, then save or print.
-
-The current content, including all six positions and the independent projects and community section, was exported and visually checked as **two Letter pages**, with every experience entry kept together. Repeated descriptions and general-purpose skills were condensed to prioritize professional experience. Email, phone, LinkedIn, and the live resume URL are visible and linked in the PDF. Project and YouTube links remain readable on paper. `personalInfo.resumeUrl` stores the public URL even when viewing or printing locally. The document title supplies a useful default PDF filename.
-
-After updating `resumeData.js`, check the print preview again. Pagination flows with the content; the layout has no fixed page height or hidden overflow that could cut off additional text. A longer resume can add pages. Preserve the print rules for section headings, job entries, and list items when changing the layout.
 
 ## How the projects connect
 
 ```text
 Browser -> React frontend -> ASP.NET Core API -> SQL Server / Azure SQL
-                 |
-                 +-> Resume content in src/data/resumeData.js
 ```
 
 The related `RS_MMM_BACKEND` repository contains database scripts and an Azure template. The runnable API source was found in a separate checkout:
@@ -93,18 +80,32 @@ C:\Users\sctig\Repos\
 
 See the [backend setup instructions](https://github.com/ScTigerFang/RS_MMM_BACKEND/blob/main/README.md) for database initialization, API startup, and the local SDK workaround. When working locally, the same instructions are in `C:\Users\sctig\Repos\RS_MMM_BACKEND\README.md`.
 
-### API configuration limitation
+### API configuration
 
-The following hooks currently hardcode `https://rsmmmapi.azurewebsites.net`:
+All API calls use the shared base URL in `src/config/api.js`. To use the local API described in the backend setup instructions, set `REACT_APP_API_URL=http://localhost:5130` in `.env.local` and restart the frontend. Starting a local API without this override leaves requests pointed at the hosted API.
 
-- `src/hooks/useMethods.js` — GET `/MoneyMakingMethod`.
-- `src/hooks/useIntensity.js` — GET `/Intensity`.
-- `src/hooks/useCreateMethod.js` — POST `/MoneyMakingMethod`.
-- `src/hooks/useUpdateMethod.js` — PUT `/MoneyMakingMethod/{id}`.
+The API needs a working development database connection and a CORS policy allowing the exact frontend origin. `http://localhost:3000` and `http://127.0.0.1:3000` are different origins. Public reads use GET `/MoneyMakingMethod` and GET `/Intensity`; owner writes use POST `/MoneyMakingMethod` and PUT `/MoneyMakingMethod/{id}`.
 
-Starting a local API does **not** switch these requests to localhost. There is currently no implemented API-base-URL environment variable; adding `REACT_APP_API_URL` alone has no effect. Add/Edit controls target the hosted API even when this frontend runs locally.
+### Owner sign-in setup
 
-To connect the full stack locally, the hooks need a shared configurable API base URL pointing to the local API, and that API needs a working development database connection. Its current CORS policy allows the exact browser origin `http://localhost:3000`; `http://127.0.0.1:3000` is a different origin. These integration changes are not part of the current setup.
+The methods page remains readable without signing in. Choosing **Owner sign in** loads Google's sign-in button. The frontend sends the returned Google ID token to GET `/auth/session` as a Bearer token and enables editing only after the API confirms owner access and a future expiration time. The credential stays in memory, so reloading the page requires signing in again. Expiration or sign-out removes editing controls; mutation requests also check the session immediately before sending the token.
+
+Create or select an OAuth client with the **Web application** type and configure its OAuth branding using [Google's official setup guide](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid). Add these Authorized JavaScript origins:
+
+- `https://www.the-tigerfang.com`
+- `https://the-tigerfang.com`
+- `http://localhost`
+- `http://localhost:3000`
+
+The two localhost entries follow Google's local-development guidance. This app uses a JavaScript callback for sign-in, so it does not need a redirect URI or a client secret for this flow.
+
+Configure the same client ID in the frontend's `REACT_APP_GOOGLE_CLIENT_ID` and the API's `Auth__GoogleClientId`. Set `Auth__OwnerEmail` only in the API environment to the confirmed owner Gmail account. Optionally set `Auth__OwnerSubject` there to pin access to that account's stable Google subject identifier. The API must verify the token and enforce owner authorization on every mutation; a successful Google sign-in alone does not grant editing access.
+
+The site's public client ID is configured in `.env` and as the deployment workflow's fallback. A nonempty `REACT_APP_GOOGLE_CLIENT_ID` GitHub repository variable overrides that fallback. For local frontend overrides, use `.env.local`.
+
+The local API project uses .NET user secrets (`rs-mmm-api-owner-auth`) for its client ID and owner email in the Development environment. These settings stay outside Git and are not deployed. Start it with `--no-launch-profile -- --urls http://localhost:5130 --environment Development` to avoid opening a browser; set `REACT_APP_API_URL=http://localhost:5130` in the frontend's `.env.local` when testing against it. A working development database is still needed for the methods table.
+
+For production, set `Auth__GoogleClientId` to the same public client ID and `Auth__OwnerEmail` to the confirmed owner account in Azure App Service environment variables. Keep the owner allowlist out of frontend files and variables. A real Google login and production authorization still require the protected API to be configured and deployed.
 
 ## Build and test
 
@@ -115,27 +116,28 @@ npm test -- --watchAll=false --runInBand
 
 The production build writes to `build/`. The build script sets `CI=false`; a successful build does not mean the test suite passed.
 
-Verification on **October 24, 2026**:
-
-- Development server started; the resume rendered and survived a direct browser reload.
-- Production build passed.
-- The updated interaction suite passes five tests covering loading until both API responses arrive, resume navigation and printing, background isolation, method filtering/sorting/editing, and a failed save that preserves the form. These tests mock Axios, so they make no live API writes.
-- The education section now uses valid article/paragraph markup, resolving the previous DOM-nesting warning.
-- The complete resume PDF was rendered and all pages visually inspected; the current content fits two Letter pages. No site navigation, artwork, or marketing copy appears in the PDF.
+The interaction tests mock Axios, so they make no live API writes. When changing résumé privacy behavior, check the request links and legacy route redirects, then inspect the generated HTML, manifest, JavaScript, and source maps for unintended personal details or résumé content. The explicitly selected request email remains public by design.
 
 ## Troubleshooting
 
 | Symptom | What to check |
 | --- | --- |
 | npm cannot find `package.json` | Change into `RS_MMM_FRONTEND\RS_MMM_Frontend`, not its parent directory. |
-| Unexpected game background | Set `REACT_APP_BACKGROUND_IMAGES` in `.env.local`, then restart the server. Only the RuneScape page uses that list; the resume always uses its plain background. |
+| Unexpected game background | Set `REACT_APP_BACKGROUND_IMAGES` in `.env.local`, then restart the server. Only the RuneScape page uses that list. |
 | Port 3000 is occupied | Use the server already running there, or stop it with Ctrl+C in its terminal before restarting. A different frontend port requires a matching CORS policy when using the local API. |
-| Resume works but RS MMM shows an error | Check the hosted API and its database connection. The resume does not query the API. |
-| Local API works in Swagger but browser requests fail | Check the hardcoded hook URLs, the exact frontend origin allowed by CORS, and any HTTPS certificate errors. |
-| Browserslist or Babel warnings | The current toolchain emits dependency-maintenance warnings. Record them separately from compilation failures; the verified build passed with these warnings. |
+| Home works but RS MMM shows an error | Check the hosted API and its database connection. The homepage does not query the API. |
+| Request résumé does not open an email application | Check that the visitor has an email application configured to handle `mailto:` links. The site does not submit an email through the API. |
+| Local API works in Swagger but browser requests fail | Check `REACT_APP_API_URL`, the exact frontend origin allowed by CORS, and any HTTPS certificate errors. Restart the frontend after changing `.env.local`. |
+| Owner sign-in controls are missing | Set `REACT_APP_GOOGLE_CLIENT_ID`, then restart the development server or rebuild the deployed frontend. Missing configuration intentionally leaves editing disabled. |
+| Google sign-in succeeds but editing remains disabled | Check `/auth/session`, the API's client ID and owner configuration, and that the selected Google account is the configured owner. The client IDs must match. |
+| Browserslist or Babel warnings | The current toolchain can emit dependency-maintenance warnings. Record them separately from compilation failures. |
 
 ## Deployment
 
 [.github/workflows/the-tigerfang_deployment.yml](.github/workflows/the-tigerfang_deployment.yml) builds and deploys to **Azure Static Web Apps** on pushes to `main` and handles pull-request deployments. The workflow uses the GitHub secret `TheTigerFang_deployment` for the Azure deployment token and publishes the `build/` directory. Its API location is empty, so it does not deploy the separate C# API.
 
+Deploy the API authorization changes and configure its `Auth__*` settings before deploying the frontend. Hiding Add/Edit controls in the frontend cannot prevent direct requests to an unprotected API. Verify that anonymous and non-owner writes are rejected by the deployed API, then deploy the frontend with its matching client ID and API URL.
+
 `staticwebapp.config.json` defines SPA navigation fallback and cache headers. GoDaddy is the DNS provider recorded for the site. Running `npm start` or `npm run build` locally does not deploy the website.
+
+These changes have not been deployed. The public client ID is configured; real Google sign-in verification still needs the protected API running with its owner configuration.

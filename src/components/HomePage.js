@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Icon from "./Icon";
+import { resumeRequestHref } from "../config/contact";
 import "../Styling/HomePage.css";
 
 export default function HomePage() {
@@ -24,13 +25,13 @@ export default function HomePage() {
             <span>Adventurer at heart.</span>
           </h1>
           <p className="home-intro">
-            I'm Daniel Beals — a full stack developer, problem solver, and the
-            player behind Tigerfang.
+            I'm TigerFang — a full stack developer, problem solver, and RuneScape
+            adventurer.
           </p>
           <div className="home-actions">
-            <Link className="button button--gold" to="/resume">
-              View my resume <Icon name="arrow" />
-            </Link>
+            <a className="button button--gold" href={resumeRequestHref}>
+              Request résumé <Icon name="document" />
+            </a>
             <Link className="text-link" to="/rs_MMM">
               Explore RS MMM <Icon name="external" />
             </Link>
@@ -53,8 +54,8 @@ export default function HomePage() {
           <p>Different quests. The same curiosity.</p>
         </div>
         <div className="home-cards">
-          <Link
-            to="/resume"
+          <a
+            href={resumeRequestHref}
             className="destination-card destination-card--resume"
           >
             <div className="destination-top">
@@ -66,13 +67,12 @@ export default function HomePage() {
             </div>
             <h3>Experience &amp; expertise.</h3>
             <p>
-              Full stack development, cloud architecture, and the teams I've
-              helped along the way.
+              Interested in working together? My résumé is available on request.
             </p>
             <span className="destination-cta">
-              Get to know my work <Icon name="arrow" />
+              Request résumé <Icon name="document" />
             </span>
-          </Link>
+          </a>
           <Link
             to="/rs_MMM"
             className="destination-card destination-card--game"

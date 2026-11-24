@@ -124,7 +124,7 @@ export default function MethodsTable({ data, onEdit }) {
           </div>
         ),
       },
-      {
+      ...(onEdit ? [{
         Header: "Edit",
         id: "actions",
         disableFilters: true,
@@ -138,7 +138,7 @@ export default function MethodsTable({ data, onEdit }) {
             Edit <Icon name="arrow" />
           </button>
         ),
-      },
+      }] : []),
     ],
     [newestTimestamp, onEdit],
   );
@@ -257,7 +257,7 @@ export default function MethodsTable({ data, onEdit }) {
                   <p>
                     {data.length
                       ? "Try another search, or clear your filters."
-                      : "Add a method to get started."}
+                      : onEdit ? "Add a method to get started." : "Check back soon for new methods."}
                   </p>
                   {data.length ? (
                     <button

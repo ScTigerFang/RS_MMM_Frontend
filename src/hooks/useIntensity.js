@@ -1,9 +1,9 @@
 import { useQuery } from "react-query";
 import axios from "axios";
+import { apiBaseUrl } from "../config/api";
 
 const fetchIntensity = async () => {
-  const response = await axios.get("https://rsmmmapi.azurewebsites.net/Intensity");
-  console.log(response);
+  const response = await axios.get(`${apiBaseUrl}/Intensity`);
   return response.data;
 };
 

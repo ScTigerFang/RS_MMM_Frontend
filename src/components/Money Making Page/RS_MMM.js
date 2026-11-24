@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "../../Styling/MethodsPage.css";
 import { backgroundImages } from "../../config/images";
 import { useCreateMethod } from "../../hooks/useCreateMethod";
@@ -8,8 +8,11 @@ import { useUpdateMethod } from "../../hooks/useUpdateMethod";
 import Icon from "../Icon";
 import MethodModal from "./MethodModal";
 import MethodsTable from "./MethodsTable";
+import { useOwnerAuth } from "../../auth/OwnerAuthContext";
+import OwnerControls from "../OwnerControls";
 
 export default function RS_MMM() {
+  const { canEdit } = useOwnerAuth();
   const {
     data: methodsData,
     isLoading: methodsLoading,
@@ -31,6 +34,12 @@ export default function RS_MMM() {
   const [editing, setEditing] = useState(null);
   const createMethod = useCreateMethod();
   const updateMethod = useUpdateMethod();
+  useEffect(() => {
+    if (!canEdit) {
+      setModalOpen(false);
+      setEditing(null);
+    }
+  }, [canEdit]);
   const isLoading = methodsLoading || intensityLoading;
   const hasError = Boolean(methodsError || intensityError);
   const isFetching = methodsFetching || intensityFetching;
@@ -47,6 +56,7 @@ export default function RS_MMM() {
   );
 
   const handleSave = async (formPayload) => {
+    if (!canEdit) throw new Error("Owner sign-in is required to edit methods.");
     if (editing) {
       await updateMethod.mutateAsync({
         methodId: editing.methodId,
@@ -70,12 +80,13 @@ export default function RS_MMM() {
         <header className="methods-hero">
           <h1>Money Making Methods</h1>
         </header>
+        <OwnerControls />
         <section className="methods-panel" aria-labelledby="method-board-title">
           <div className="methods-panel-heading">
             <div>
               <h2 id="method-board-title">Methods</h2>
             </div>
-            <button
+            {canEdit ? <button
               className="button button--gold"
               disabled={isLoading || hasError}
               onClick={() => {
@@ -84,7 +95,7 @@ export default function RS_MMM() {
               }}
             >
               <Icon name="plus" /> Add method
-            </button>
+            </button> : null}
           </div>
           {isLoading ? (
             <div className="methods-loading" role="status" aria-live="polite">
@@ -120,22 +131,22 @@ export default function RS_MMM() {
           ) : (
             <MethodsTable
               data={methodsWithIntensity}
-              onEdit={(method) => {
+              onEdit={canEdit ? (method) => {
                 setEditing(method);
                 setModalOpen(true);
-              }}
+              } : undefined}
             />
           )}
         </section>
       </div>
-      <MethodModal
+      {canEdit ? <MethodModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
         defaultValues={editing}
         intensityOptions={intensities}
         skillOptions={["Skilling", "Bossing", "Combat", "AFK", "Custom"]}
-      />
+      /> : null}
     </div>
   );
 }

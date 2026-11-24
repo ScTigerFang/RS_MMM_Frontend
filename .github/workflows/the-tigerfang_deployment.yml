@@ -38,6 +38,8 @@ jobs:
           ###### End of Repository/Build Configurations ######
         env:
           REACT_APP_VERSION: ${{ env.REACT_APP_VERSION }} # Make the version available to the build process
+          REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL }}
+          REACT_APP_GOOGLE_CLIENT_ID: ${{ vars.REACT_APP_GOOGLE_CLIENT_ID || '455742213369-srebduccq28r43p0j30q2qce3tnklf7t.apps.googleusercontent.com' }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

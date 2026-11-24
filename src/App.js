@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import {
   NavLink,
+  Navigate,
   Route,
   BrowserRouter as Router,
   Routes,
@@ -10,21 +11,21 @@ import {
 import "./App.css";
 import HomePage from "./components/HomePage";
 import RS_MMM from "./components/Money Making Page/RS_MMM";
-import ResumePage from "./components/ResumePage";
 import Footer from "./components/Footer";
+import { resumeRequestHref } from "./config/contact";
+import { OwnerAuthProvider } from "./auth/OwnerAuthContext";
 
 const queryClient = new QueryClient();
 
 function SiteLayout() {
   const { pathname } = useLocation();
-  const isResume = pathname === "/resume";
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
   return (
-    <div className={"site-shell" + (isResume ? " site-shell--resume" : "")}>
+    <div className="site-shell">
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
@@ -40,7 +41,6 @@ function SiteLayout() {
             />
             <span>
               <span className="brand-name">TigerFang</span>
-              <span className="brand-caption">Daniel Beals</span>
             </span>
           </NavLink>
           <nav className="site-nav" aria-label="Main navigation">
@@ -48,7 +48,7 @@ function SiteLayout() {
               Home
             </NavLink>
             <NavLink to="/rs_MMM">RS MMM</NavLink>
-            <NavLink to="/resume">Resume</NavLink>
+            <a href={resumeRequestHref}>Request résumé</a>
           </nav>
         </div>
       </header>
@@ -56,7 +56,7 @@ function SiteLayout() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/rs_MMM" element={<RS_MMM />} />
-          <Route path="/resume" element={<ResumePage />} />
+          <Route path="/resume/*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
@@ -67,9 +67,11 @@ function SiteLayout() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <SiteLayout />
-      </Router>
+      <OwnerAuthProvider>
+        <Router>
+          <SiteLayout />
+        </Router>
+      </OwnerAuthProvider>
     </QueryClientProvider>
   );
 }

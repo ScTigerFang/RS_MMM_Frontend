@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="site-footer-inner">
         <span className="footer-brand">TigerFang</span>
         <span>
-          © {new Date().getFullYear()} Daniel Beals
+          © {new Date().getFullYear()} TigerFang
           {process.env.REACT_APP_VERSION
             ? " · v" + process.env.REACT_APP_VERSION
             : ""}

@@ -36,6 +36,27 @@
   border-radius: 7px;
   box-shadow: 0 15px 40px #0002;
 }
+.owner-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+  color: #bec9ca;
+  font-size: 14px;
+}
+.owner-sign-in {
+  flex-basis: 100%;
+  display: grid;
+  justify-items: end;
+  gap: 12px;
+}
+.owner-controls [role="alert"] {
+  flex-basis: 100%;
+  text-align: right;
+  color: #f0b4a3;
+}
 .methods-panel-heading {
   padding: 25px 28px;
   display: flex;

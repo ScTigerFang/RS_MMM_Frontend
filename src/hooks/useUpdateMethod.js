@@ -1,14 +1,20 @@
 import axios from "axios";
 import { useMutation } from "react-query";
+import { useOwnerAuth } from "../auth/OwnerAuthContext";
+import { apiBaseUrl } from "../config/api";
 
-const updateMethod = async ({ methodId, ...updates }) => {
-    // PUT /MoneyMakingMethod/{id}
-    await axios.put(
-        `https://rsmmmapi.azurewebsites.net/MoneyMakingMethod/${methodId}`,
-        { methodId, ...updates }
-    );
-    // you could return something here if you need it
+export const useUpdateMethod = (options = {}) => {
+  const { getRequestConfig, signOut } = useOwnerAuth();
+  return useMutation(async ({ methodId, ...updates }) => {
+    try {
+      await axios.put(
+        `${apiBaseUrl}/MoneyMakingMethod/${encodeURIComponent(methodId)}`,
+        { methodId, ...updates },
+        getRequestConfig(),
+      );
+    } catch (error) {
+      if ([401, 403].includes(error.response?.status)) signOut();
+      throw error;
+    }
+  }, options);
 };
-
-export const useUpdateMethod = (options = {}) =>
-    useMutation(updateMethod, { ...options });

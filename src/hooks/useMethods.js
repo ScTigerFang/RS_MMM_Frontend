@@ -1,9 +1,9 @@
 import { useQuery } from "react-query";
 import axios from "axios";
+import { apiBaseUrl } from "../config/api";
 
 const fetchMethods = async () => {
-  const response = await axios.get("https://rsmmmapi.azurewebsites.net/MoneyMakingMethod");
-  console.log(response.data);
+  const response = await axios.get(`${apiBaseUrl}/MoneyMakingMethod`);
   return response.data;
 };
 

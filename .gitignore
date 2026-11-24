@@ -11,6 +11,9 @@
 # production
 /build
 
+# Local-only resume archive; never publish personal resume content.
+/private-resume/
+
 # misc
 .DS_Store
 .env.local

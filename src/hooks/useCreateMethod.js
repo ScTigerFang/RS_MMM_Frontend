@@ -1,16 +1,21 @@
 import axios from "axios";
 import { useMutation } from "react-query";
+import { useOwnerAuth } from "../auth/OwnerAuthContext";
+import { apiBaseUrl } from "../config/api";
 
-const createMethod = async (newMethod) => {
-    // POST /MoneyMakingMethod
-    const { data } = await axios.post(
-        "https://rsmmmapi.azurewebsites.net/MoneyMakingMethod",
-        newMethod
-    );
-    return data;
+export const useCreateMethod = (options = {}) => {
+  const { getRequestConfig, signOut } = useOwnerAuth();
+  return useMutation(async (newMethod) => {
+    try {
+      const { data } = await axios.post(
+        `${apiBaseUrl}/MoneyMakingMethod`,
+        newMethod,
+        getRequestConfig(),
+      );
+      return data;
+    } catch (error) {
+      if ([401, 403].includes(error.response?.status)) signOut();
+      throw error;
+    }
+  }, options);
 };
-
-export const useCreateMethod = (options = {}) =>
-    useMutation(createMethod, {
-        ...options,
-    });

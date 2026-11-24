@@ -1,13 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/images/*", "/css/*", "/js/*"]
-  },
-  "responseOverrides": {
-    "404": {
-      "rewrite": "/index.html",
-      "statusCode": 200
-    }
+    "exclude": ["/images/*", "/css/*", "/js/*", "/resume", "/resume/*"]
   },
   "globalHeaders": {
     "cache-control": "no-cache, no-store, must-revalidate",
